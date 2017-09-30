@@ -1,0 +1,11 @@
+{
+  "name": "project-vimlet-meta",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "node build/test.js"
+  },
+  "author": "",
+  "license": "UNLICENSED"
+}

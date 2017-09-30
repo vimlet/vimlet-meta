@@ -1,0 +1,13 @@
+{
+  "name": "vimlet-meta",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "commander": "^2.9.0",
+    "js-yaml": "^3.8.4",
+    "mkdirp": "^0.5.1"
+  }
+}
