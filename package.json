@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format2":  "node_modules/.bin/eslint 'src/**/*.js' --no-eslintrc --ignore-pattern '**/node_modules/**' --rule 'quotes: [2, double]' --fix",
-    "format": "node_modules/.bin/prettier --write **/*.js",
+    "format2":  "node_modules/.bin/eslint src/**/*.js --fix",
+    "format": "node_modules/.bin/prettier **/*.js --write ",
     "build": "node build/build.js"
   },
   "author": "",
@@ -18,5 +18,13 @@
   "pre-commit": [
     "format",
     "build"
+  ],  
+  "eslintConfig": {
+    "rules": {
+      "quotes": [2, "double"]
+    }
+  },
+  "eslintIgnore": [
+    "**/node_modules/**"
   ]
 }
