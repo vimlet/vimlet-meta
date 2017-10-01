@@ -4,8 +4,17 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "format": "node node_modules/prettier/bin/prettier.js --write **/*.js",
     "build": "node build/build.js"
   },
   "author": "",
-  "license": "UNLICENSED"
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "prettier": "^1.7.3",
+    "pre-commit": "^1.2.2"
+  },
+  "pre-commit": [
+    "format",
+    "build"
+  ]
 }
