@@ -4,14 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format": "node node_modules/prettier/bin/prettier.js --write **/*.js",
+    "format2":  "node_modules/.bin/eslint 'src/**/*.js' --no-eslintrc --ignore-pattern '**/node_modules/**' --rule 'quotes: [2, double]' --fix",
+    "format": "node_modules/.bin/prettier --write **/*.js",
     "build": "node build/build.js"
   },
   "author": "",
   "license": "UNLICENSED",
   "devDependencies": {
     "prettier": "^1.7.3",
-    "pre-commit": "^1.2.2"
+    "pre-commit": "^1.2.2",
+    "eslint": "^4.8.0"
   },
   "pre-commit": [
     "format",

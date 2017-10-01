@@ -3,7 +3,7 @@
 "use strict";
 
 // Require
-var generator = require('./lib/base');
+var generator = require("./lib/base");
 var generatorInstance = generator.instance();
 
 // Generator node config
@@ -12,7 +12,6 @@ generatorInstance.engine = "node";
 // Interpreter
 this.instance = function() {
   return generator.instance();
-  
 };
 
 // Command
