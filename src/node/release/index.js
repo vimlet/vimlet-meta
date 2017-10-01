@@ -12,6 +12,7 @@ generatorInstance.engine = "node";
 // Interpreter
 this.instance = function() {
   return generator.instance();
+  
 };
 
 // Command
