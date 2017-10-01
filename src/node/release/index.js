@@ -90,6 +90,7 @@ function getDataFile(data) {
     } else {
       dataFile = readData(data);
     }
+
     return dataFile;
   }
 }
