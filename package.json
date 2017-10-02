@@ -21,26 +21,12 @@
     "npm-run-all": "^4.1.1"
   },
   "eslintConfig": {
+    "extends": "eslint:recommended",
     "rules": {
-      "quotes": [
-        2,
-        "double"
-      ],
-      "keyword-spacing": [
-        2,
-        {
-          "before": true,
-          "after": true
-        }
-      ],
-      "padding-line-between-statements": [
-        2,
-        {
-          "blankLine": "always",
-          "prev": "*",
-          "next": "if"
-        }
-      ]
+      "quotes": [2, "double"],
+      "no-undef": "off",
+      "no-useless-escape": "off",
+      "no-console": "off"
     }
   },
   "eslintIgnore": [

@@ -22,8 +22,6 @@ exports.instance = function() {
     generator.lineBreak = generator.lineBreak || null;
 
     generator.parseTemplate = function(template, callback, data, context) {
-      var __self = this;
-
       // Tags
       generator.__tagOpen = generator.tags[0];
       generator.__tagClose = generator.tags[1];
@@ -95,6 +93,7 @@ exports.instance = function() {
         // TODO replace XMLHttpRequest by window.fetch with synchronous support
         // Browser
         var xhttp = new XMLHttpRequest();
+
         xhttp.onreadystatechange = function() {
           if (this.readyState === 4) {
             if (this.status === 200) {

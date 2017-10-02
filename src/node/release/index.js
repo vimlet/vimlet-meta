@@ -39,10 +39,6 @@ exports.parse = function(template, output, data) {
   );
 };
 
-var list = function(val) {
-  return val.split(",");
-};
-
 // Command mode
 if (!module.parent) {
   program
@@ -80,11 +76,15 @@ function getDataFile(data) {
     var dataFile = {};
     // If data is directory then take all json files
     var isDirectory = false;
+
     try {
       if (fs.lstatSync("" + data).isDirectory()) {
         isDirectory = true;
       }
-    } catch (exception) {}
+    } catch (exception) {
+      // Do nothing
+    }
+
     if (isDirectory) {
       dataFile = readFolderData(data);
     } else {
