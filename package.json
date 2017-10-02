@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "precommit": "npm run build & npm run format & npm run test",
+    "precommit": "run-s build format test",
     "test": "node_modules/.bin/intern-client config=tests/intern",
-    "format": "npm run format:prettier & npm run format:eslint",
+    "format": "run-s format:prettier format:eslint",
     "format:eslint": "node_modules/.bin/eslint src/**/*.js --fix",
     "format:prettier": "node_modules/.bin/prettier src/**/*.js --write",
     "build": "node build/build.js"
@@ -17,7 +17,8 @@
     "prettier": "^1.7.3",
     "eslint": "^4.8.0",
     "intern": "^3.4.6",
-    "husky": "^0.14.3"
+    "husky": "^0.14.3",
+    "npm-run-all": "^4.1.1"
   },
   "eslintConfig": {
     "rules": {
