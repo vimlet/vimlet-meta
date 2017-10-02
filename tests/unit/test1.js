@@ -9,7 +9,7 @@ define(function (require) {
 
     registerSuite({
         "Hello Test": function () {         
-            assert.equal(nodeExample.sayHello(), "hello", "Return isn't hello");
+            assert.equal(nodeExample.sayHello(), "hellos", "Return isn't hello");
         },
         // 'failing test': function () {
         //     var result = 2 * 3;
