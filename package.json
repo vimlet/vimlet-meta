@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "test": "node_modules/.bin/intern-client config=tests/intern",
     "format": "npm run format:prettier & npm run format:eslint",
     "format:eslint": "node_modules/.bin/eslint src/**/*.js --fix",
     "format:prettier": "node_modules/.bin/prettier src/**/*.js --write",
@@ -18,8 +19,9 @@
     "intern": "^3.4.6"
   },
   "pre-commit": [
+    "build",
     "format",
-    "build"
+    "test"
   ],
   "eslintConfig": {
     "rules": {
