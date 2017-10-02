@@ -43,7 +43,7 @@ exports.parse = function(template, output, data) {
 if (!module.parent) {
   program
     .version("0.0.1")
-    .option("-t, --template <item>", 'Add template')
+    .option("-t, --template <item>", "Add template")
     .option("-d, --data <item, item...>", "Add data", list)
     .option("-o, --output <item>", "Add output")
     .parse(process.argv);
