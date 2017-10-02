@@ -20,8 +20,8 @@ define({
 	// https://theintern.io/intern/#reporter-results
 	// https://theintern.io/intern/#custom-reporters
 	reporters: [
-		// { id: "console" },
-		{ id: "Pretty" },
+		{ id: "console" },
+		// { id: "Pretty" },
 		{ id: 'JUnit', filename: 'tests/report.xml' }
 	],
 
