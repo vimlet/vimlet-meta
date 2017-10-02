@@ -6,7 +6,7 @@
   "scripts": {
     "format": "npm run format:prettier & npm run format:eslint",
     "format:eslint": "node_modules/.bin/eslint src/**/*.js --fix",
-    "format:prettier": "node_modules/.bin/prettier **/*.js --write",
+    "format:prettier": "node_modules/.bin/prettier src/**/*.js --write",
     "build": "node build/build.js"
   },
   "author": "",
@@ -14,7 +14,8 @@
   "devDependencies": {
     "pre-commit": "^1.2.2",
     "prettier": "^1.7.3",
-    "eslint": "^4.8.0"
+    "eslint": "^4.8.0",
+    "intern": "^3.4.6"
   },
   "pre-commit": [
     "format",
