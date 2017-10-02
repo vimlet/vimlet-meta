@@ -37,8 +37,8 @@
         2,
         {
           "blankLine": "always",
-          "prev": "if",
-          "next": "*"
+          "prev": "*",
+          "next": "if"
         }
       ]
     }
