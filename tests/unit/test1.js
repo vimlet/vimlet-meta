@@ -15,7 +15,6 @@ define(function (require) {
         //     var result = 2 * 3;
         //     assert.equal(result, 5, 'Addition operator should add numbers together');
         // }
-
     });
 
 });

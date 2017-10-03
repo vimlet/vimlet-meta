@@ -1,1 +1,1 @@
-<?xml version="1.0" encoding="UTF-8" ?><testsuites><testsuite name="Node.js" failures="0" skipped="0" tests="1" time="0.006"><testsuite name="Node.js" failures="0" skipped="0" tests="1" time="0.004"><testcase name="Hello Test" time="0.001" status="0"/></testsuite></testsuite></testsuites>
+<?xml version="1.0" encoding="UTF-8" ?><testsuites><testsuite name="Node.js" failures="0" skipped="0" tests="1" time="0.006"><testsuite name="Node.js" failures="0" skipped="0" tests="1" time="0.004"><testcase name="Hello Test" time="0" status="0"/></testsuite></testsuite></testsuites>
