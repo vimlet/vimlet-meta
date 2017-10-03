@@ -9,8 +9,8 @@
     "format": "run-s format:prettier format:eslint",
     "format:eslint": "node_modules/.bin/eslint src/**/*.js --fix",
     "format:prettier": "node_modules/.bin/prettier src/**/*.js --write",
-    "build": "node build/build.js",
-    "badges": "node build/badges.js"
+    "build": "node scripts/build.js",
+    "badges": "node scripts/badges.js"
   },
   "author": "",
   "license": "UNLICENSED",

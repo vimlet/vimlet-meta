@@ -4,8 +4,6 @@
 //
 // MODE: COMMAND	(node)
 
-var unused;
-
 var generator = generator || {};
 
 (function() {
