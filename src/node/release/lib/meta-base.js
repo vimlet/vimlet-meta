@@ -30,11 +30,11 @@ exports.instance = function() {
       // Regex
       generator.__regex = new RegExp(
         generator.__escapeRegExp(generator.__tagOpen) +
-        "(?:(?!" +
-        generator.__escapeRegExp(generator.__tagOpen) +
-        ")[\\s\\S])*" +
-        generator.__escapeRegExp(generator.__tagClose) +
-        "(\\r\\n|\\r|\\n){0,1}",
+          "(?:(?!" +
+          generator.__escapeRegExp(generator.__tagOpen) +
+          ")[\\s\\S])*" +
+          generator.__escapeRegExp(generator.__tagClose) +
+          "(\\r\\n|\\r|\\n){0,1}",
         "g"
       );
 
@@ -195,12 +195,6 @@ exports.instance = function() {
       };
 
       sandbox.__eval = function(s, basepath) {
-
-
-        generator.lineBreak = generator.lineBreak || " "; // TODO REVIEW If that works, then check line 281 and remove old linebreak replacement
-        s = s.replace(/(?:\r\n|\r|\n)/g, generator.lineBreak); // TODO REVIEW
-
-
         sandbox.__output = "";
         sandbox.__basePath = basepath;
 

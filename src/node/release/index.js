@@ -3,7 +3,7 @@
 "use strict";
 
 // Require
-var generator = require("./lib/meta-base.js");
+var generator = require("./lib/base");
 var generatorInstance = generator.instance();
 
 // Generator node config
