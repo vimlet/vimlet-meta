@@ -1,5 +1,5 @@
 {
-  "name": "vimlet-meta",
+  "name": "@vimlet/vimlet-meta",
   "version": "1.0.1",
   "description": "",
   "main": "index.js",
