@@ -14,13 +14,13 @@ nodeBase += "\n\nreturn generator;\n\n";
 nodeBase += "}";
 
 fs.writeFileSync(
-  path.join(__dirname, "../src/node/release/lib/meta-base.js"),
+  path.join(__dirname, "../src/node/lib/meta-base.js"),
   nodeBase
 );
 
 // --- Build browser ---
 
 fs.writeFileSync(
-  path.join(__dirname, "../src/browser/release/vimlet-meta.js"),
+  path.join(__dirname, "../src/browser/vimlet-meta.js"),
   baseFile
 );
