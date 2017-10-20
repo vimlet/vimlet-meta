@@ -28,12 +28,12 @@ var path = require("path");
  * @param  {[type]} data     [description]
  * @return {[type]}          [description]
  */
-exports.parse = function(template, output, data) {
+exports.parse = function(template, output, data, callback) {
   var dataFile = getDataFile(data);
   generatorInstance.parseTemplate(
     template,
     function(result) {
-      writeToDisk(output, result);
+      writeToDisk(output, result, callback);
     },
     dataFile
   );
@@ -95,15 +95,25 @@ function getDataFile(data) {
   }
 }
 
-function writeToDisk(output, result) {
+function writeToDisk(output, result, callback) {
   fs.mkdirp(getDirName("" + output), function(err) {
     if (err) {
+      if (callback) {
+        callback(err);
+      }
       return console.log(err);
     }
 
     fs.writeFile("" + output, result, function(err) {
       if (err) {
+        if (callback) {
+          callback(err);
+        }
         return console.log(err);
+      } else {
+        if (callback) {
+          callback();
+        }
       }
     });
   });
