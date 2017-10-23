@@ -23,7 +23,7 @@ vimlet.meta = vimlet.meta || {};
   //Line break replacement
   vimlet.meta.lineBreak = vimlet.meta.lineBreak || null;
 
-  vimlet.meta.parse = function (text, callback, data, context) {
+  vimlet.meta.parse = function (text, data, callback, context) {
     vimlet.meta.__setTags();
     var __sandbox = vimlet.meta.__createSandbox(context);
     __sandbox.data = data || {};
@@ -32,7 +32,7 @@ vimlet.meta = vimlet.meta || {};
     callback(result);
   };
 
-  vimlet.meta.parseTemplate = function (template, callback, data, context) {
+  vimlet.meta.parseTemplate = function (template, data, callback, context) {
     vimlet.meta.__setTags();
     var __sandbox = vimlet.meta.__createSandbox(context);
     __sandbox.data = data || {};
