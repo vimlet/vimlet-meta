@@ -10,7 +10,7 @@ var baseFile = fs.readFileSync(
 var nodeBase = "";
 nodeBase += "exports.instance = function() {\n\n";
 nodeBase += baseFile.toString();
-nodeBase += "\n\nreturn generator;\n\n";
+nodeBase += "\n\nreturn vimlet.meta;\n\n";
 nodeBase += "}";
 
 fs.writeFileSync(

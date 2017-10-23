@@ -62,7 +62,7 @@ vimlet.meta = vimlet.meta || {};
     );
   };
 
-  //Escape special characters from tags
+  //Esacape special characters from tags
   vimlet.meta.__escapeRegExp = function (str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
   };
@@ -229,6 +229,7 @@ vimlet.meta = vimlet.meta || {};
 
       // Eval matches
       var matches = t.match(vimlet.meta.__regex);
+
       if (matches) {
         for (var i = 0; i < matches.length; i++) {
           matches[i] = vimlet.meta.__cleanMatch(matches[i]);
@@ -251,6 +252,7 @@ vimlet.meta = vimlet.meta || {};
           vimlet.meta.lineBreak
         );
       }
+
       return result;
     };
 
@@ -307,6 +309,7 @@ vimlet.meta = vimlet.meta || {};
   };
 }.apply(vimlet.meta));
 
+
 return vimlet.meta;
 
-};
+}
