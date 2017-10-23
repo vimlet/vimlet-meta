@@ -4,64 +4,76 @@
 //
 // MODE: COMMAND	(node)
 
-var generator = generator || {};
 
-(function() {
+var vimlet = vimlet || {};
+
+vimlet.meta = vimlet.meta || {};
+
+(function () {
   // Node require
   var require_fs;
   var require_vm;
 
   // Engine [browser, node, nashorn]
-  generator.engine = generator.engine || "browser";
+  vimlet.meta.engine = vimlet.meta.engine || "browser";
 
   // Tags Array [tagOpen, tagClose, tagEcho]
-  generator.tags = generator.tags || ["<%", "%>", "="];
+  vimlet.meta.tags = vimlet.meta.tags || ["<%", "%>", "="];
 
   //Line break replacement
-  generator.lineBreak = generator.lineBreak || null;
+  vimlet.meta.lineBreak = vimlet.meta.lineBreak || null;
 
-  generator.parseTemplate = function(template, callback, data, context) {
-    // Tags
-    generator.__tagOpen = generator.tags[0];
-    generator.__tagClose = generator.tags[1];
-    generator.__tagEcho = generator.tags[2];
-
-    // Regex
-    generator.__regex = new RegExp(
-      generator.__escapeRegExp(generator.__tagOpen) +
-        "(?:(?!" +
-        generator.__escapeRegExp(generator.__tagOpen) +
-        ")[\\s\\S])*" +
-        generator.__escapeRegExp(generator.__tagClose) +
-        "(\\r\\n|\\r|\\n){0,1}",
-      "g"
-    );
-
-    var __sandbox = generator.__createSandbox(context);
-
+  vimlet.meta.parse = function (text, callback, data, context) {
+    vimlet.meta.__setTags();
+    var __sandbox = vimlet.meta.__createSandbox(context);
     __sandbox.data = data || {};
-
-    var result = __sandbox.__parseTemplate(template);
-
-    generator.__destroySandbox(__sandbox);
-
+    var result = __sandbox.__parse(text);
+    vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
   };
 
+  vimlet.meta.parseTemplate = function (template, callback, data, context) {
+    vimlet.meta.__setTags();
+    var __sandbox = vimlet.meta.__createSandbox(context);
+    __sandbox.data = data || {};
+    var result = __sandbox.__parseTemplate(template);
+    vimlet.meta.__destroySandbox(__sandbox);
+    callback(result);
+  };
+
+  // Intialize tags
+  vimlet.meta.__setTags = function () {
+    // Tags
+    vimlet.meta.__tagOpen = vimlet.meta.tags[0];
+    vimlet.meta.__tagClose = vimlet.meta.tags[1];
+    vimlet.meta.__tagEcho = vimlet.meta.tags[2];
+
+    // Regex
+    vimlet.meta.__regex = new RegExp(
+      vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
+      "(?:(?!" +
+      vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
+      ")[\\s\\S])*" +
+      vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
+      "(\\r\\n|\\r|\\n){0,1}",
+      "g"
+    );
+  };
+
   //Esacape special characters from tags
-  generator.__escapeRegExp = function(str) {
+  vimlet.meta.__escapeRegExp = function (str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
   };
 
   //Sanitize given string.
-  generator.sanitize = function(s) {
-    s = s.replace(generator.__tagOpen, "");
-    s = s.replace(generator.__tagClose, "");
+  vimlet.meta.sanitize = function (s) {
+    s = s.replace(vimlet.meta.__tagOpen, "");
+    s = s.replace(vimlet.meta.__tagClose, "");
     return s;
   };
 
-  generator.__getFile = function(path, callback) {
-    if (generator.engine == "node") {
+  vimlet.meta.__getFile = function (path, callback) {
+    if (vimlet.meta.engine == "node") {
       // node command
       if (!require_fs) {
         require_fs = require("fs");
@@ -69,7 +81,7 @@ var generator = generator || {};
 
       if (callback) {
         // Must be asynchronous
-        require_fs.readFile(path, "utf8", function(error, buf) {
+        require_fs.readFile(path, "utf8", function (error, buf) {
           if (error) {
             console.log(error);
           } else {
@@ -80,7 +92,7 @@ var generator = generator || {};
         // Must be synchronous
         return require_fs.readFileSync(path, "utf8").toString();
       }
-    } else if (generator.engine == "nashorn") {
+    } else if (vimlet.meta.engine == "nashorn") {
       // TODO nashorn get file
 
       if (callback) {
@@ -93,7 +105,7 @@ var generator = generator || {};
       // Browser
       var xhttp = new XMLHttpRequest();
 
-      xhttp.onreadystatechange = function() {
+      xhttp.onreadystatechange = function () {
         if (this.readyState === 4) {
           if (this.status === 200) {
             if (callback) {
@@ -119,10 +131,10 @@ var generator = generator || {};
     }
   };
 
-  generator.__createSandbox = function(context) {
+  vimlet.meta.__createSandbox = function (context) {
     var sandbox = eval.call(null, "this");
 
-    if (generator.engine == "node") {
+    if (vimlet.meta.engine == "node") {
       if (!require_vm) {
         require_vm = require("vm");
       }
@@ -145,7 +157,7 @@ var generator = generator || {};
       baseContext.__dirname = __dirname;
 
       sandbox = new require_vm.createContext(baseContext);
-    } else if (generator.engine == "nashorn") {
+    } else if (vimlet.meta.engine == "nashorn") {
       // TODO nashorn sandbox
     } else {
       // Browser sandbox
@@ -165,13 +177,13 @@ var generator = generator || {};
     }
 
     // Inject sandbox functions
-    generator.__injectSanboxFunctions(sandbox);
+    vimlet.meta.__injectSanboxFunctions(sandbox);
 
     return sandbox;
   };
 
-  generator.__destroySandbox = function(sandbox) {
-    if (generator.engine == "browser") {
+  vimlet.meta.__destroySandbox = function (sandbox) {
+    if (vimlet.meta.engine == "browser") {
       var iframe = sandbox.frameElement;
       iframe.parentNode.removeChild(iframe);
     }
@@ -179,28 +191,28 @@ var generator = generator || {};
     sandbox = null;
   };
 
-  generator.__injectSanboxFunctions = function(sandbox) {
+  vimlet.meta.__injectSanboxFunctions = function (sandbox) {
     sandbox.__output = "";
 
     sandbox.__basePath = "";
 
-    sandbox.echo = function(s) {
+    sandbox.echo = function (s) {
       sandbox.__output += s;
     };
 
-    sandbox.template = function(t) {
+    sandbox.template = function (t) {
       var __fullPath = sandbox.__basePath + "/" + t;
       sandbox.__output += sandbox.__parseTemplate(__fullPath);
     };
 
-    sandbox.__eval = function(s, basepath) {
+    sandbox.__eval = function (s, basepath) {
       sandbox.__output = "";
       sandbox.__basePath = basepath;
 
-      if (generator.engine == "node") {
+      if (vimlet.meta.engine == "node") {
         var script = new require_vm.Script(s);
         script.runInContext(sandbox);
-      } else if (generator.engine == "nashorn") {
+      } else if (vimlet.meta.engine == "nashorn") {
         // TODO nashorn eval
       } else {
         sandbox.eval.call(null, s);
@@ -209,44 +221,49 @@ var generator = generator || {};
       return sandbox.__output;
     };
 
-    sandbox.__parseTemplate = function(t) {
+    sandbox.__parse = function (t) {
       var result = "";
       var evalResult = [];
 
-      // Get file must be synchronous
-      var file = generator.__getFile(t);
-
       // Eval matches
-      var matches = file.match(generator.__regex);
+      var matches = t.match(vimlet.meta.__regex);
 
       if (matches) {
         for (var i = 0; i < matches.length; i++) {
-          matches[i] = generator.__cleanMatch(matches[i]);
+          matches[i] = vimlet.meta.__cleanMatch(matches[i]);
           evalResult.push(
-            sandbox.__eval(matches[i], generator.__getBasePath(t))
+            sandbox.__eval(matches[i], vimlet.meta.__getBasePath(t))
           );
         }
       }
 
       // Replace template with evalMatches
       var j = 0;
-      result = file.replace(generator.__regex, function() {
+      result = t.replace(vimlet.meta.__regex, function () {
         return evalResult[j++]; // returns previous value
       });
 
       //Replace line break.
-      if (generator.lineBreak) {
+      if (vimlet.meta.lineBreak) {
         result = result.replace(
           new RegExp("[\\r\\n|\\r|\\n]+", "g"),
-          generator.lineBreak
+          vimlet.meta.lineBreak
         );
       }
 
       return result;
     };
+
+    sandbox.__parseTemplate = function (t) {
+      // Get file must be synchronous
+      var file = vimlet.meta.__getFile(t);
+      // Call template parser
+      sandbox.__parse(file);
+    };
+
   };
 
-  generator.__getBasePath = function(f) {
+  vimlet.meta.__getBasePath = function (f) {
     // Replace Windows separators
     var standarPath = f.replace(/\\/g, "/");
     var path = standarPath.split("/");
@@ -266,26 +283,26 @@ var generator = generator || {};
     return base;
   };
 
-  generator.__cleanMatch = function(match) {
+  vimlet.meta.__cleanMatch = function (match) {
     // Remove new line
     match = match.trim();
 
     // Remove tags
     match = match
       .substring(
-        generator.__tagOpen.length,
-        match.length - generator.__tagClose.length
+      vimlet.meta.__tagOpen.length,
+      match.length - vimlet.meta.__tagClose.length
       )
       .trim();
 
     // Echo shortcut
-    if (match.startsWith(generator.__tagEcho)) {
+    if (match.startsWith(vimlet.meta.__tagEcho)) {
       match =
         "echo(" +
-        match.substring(generator.__tagEcho.length, match.length).trim() +
+        match.substring(vimlet.meta.__tagEcho.length, match.length).trim() +
         ");";
     }
 
     return match;
   };
-}.apply(generator));
+}.apply(vimlet.meta));
