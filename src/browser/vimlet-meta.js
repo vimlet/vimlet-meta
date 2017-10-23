@@ -258,7 +258,7 @@ vimlet.meta = vimlet.meta || {};
       // Get file must be synchronous
       var file = vimlet.meta.__getFile(t);
       // Call template parser
-      sandbox.__parse(file);
+      return sandbox.__parse(file);
     };
 
   };

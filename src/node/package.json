@@ -6,6 +6,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
+    "fs-extra": "^4.0.1",
     "commander": "^2.9.0",
     "js-yaml": "^3.8.4",
     "mkdirp": "^0.5.1"

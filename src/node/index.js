@@ -3,15 +3,15 @@
 "use strict";
 
 // Require
-var generator = require("./lib/meta-base");
-var generatorInstance = generator.instance();
+var meta = require("./lib/meta-base");
+var metaInstance = meta.instance();
 
-// Generator node config
-generatorInstance.engine = "node";
+// Meta node config
+metaInstance.engine = "node";
 
 // Interpreter
 this.instance = function() {
-  return generator.instance();
+  return meta.instance();
 };
 
 // Command
@@ -30,14 +30,16 @@ var path = require("path");
  */
 exports.parse = function(template, output, data, callback) {
   var dataFile = getDataFile(data);
-  generatorInstance.parseTemplate(
+  metaInstance.parseTemplate(
     template,
+    dataFile,
     function(result) {
       writeToDisk(output, result, callback);
-    },
-    dataFile
+    }
   );
 };
+
+// node index.js -t "../../tests/main.md.vim" -d "../../tests/data.json" -o "../../tests/salida.md"
 
 // Command mode
 if (!module.parent) {
@@ -51,18 +53,19 @@ if (!module.parent) {
   if (program.template && program.data && program.output) {
     program.template = path.resolve(program.template);
     program.output = path.resolve(program.output);
-
     var dataFile = getDataFile(program.data);
 
-    generatorInstance.parseTemplate(
+    metaInstance.parseTemplate(
       program.template,
+      dataFile,
       function(result) {
         writeToDisk(program.output, result);
-      },
-      dataFile
+      }
     );
   }
 }
+
+
 
 /**
  * Read data from file or return if JSON
@@ -84,7 +87,6 @@ function getDataFile(data) {
     } catch (exception) {
       // Do nothing
     }
-
     if (isDirectory) {
       dataFile = readFolderData(data);
     } else {
@@ -121,13 +123,11 @@ function writeToDisk(output, result, callback) {
 
 function readData(dataPath) {
   var dataFile = {};
-
   for (var i = 0; i < dataPath.length; i++) {
     var currentPath = path.resolve(dataPath[i]);
 
     if (fs.existsSync(currentPath)) {
       var tempData;
-
       if (currentPath.split(".").pop() == "yml") {
         try {
           var doc = yaml.load(fs.readFileSync(currentPath, "utf8"));
@@ -168,6 +168,6 @@ function merge(obj, src) {
   return obj;
 }
 
-var list = function(val) {
+function list(val) {
   return val.split(",");
-};
+}
