@@ -4,32 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "format": "run-s format:prettier format:eslint",
-    "format:eslint": "node_modules/.bin/eslint src/**/*.js --fix",
-    "format:prettier": "node_modules/.bin/prettier src/**/*.js --write",
     "build": "node scripts/build.js",
-    "badges": "node scripts/badges.js"
+    "format:js": "alpha format-js",
+    "format:html": "alpha format-html",
+    "format:css": "alpha format-css",
+    "format": "run-s format:js format:html format:css",
+    "test": "alpha test",
+    "doc:api": "alpha doc api -i **/*.js,**/*.html -o ../docs/api",
+    "doc:article": "alpha doc article -i ../docs/md/**/*.md -o ../docs/article",
+    "doc": "run-s doc:api doc:article",
+    "badges": "alpha badges -o badges"
   },
   "author": "",
   "license": "UNLICENSED",
   "devDependencies": {
-    "prettier": "^1.7.3",
-    "eslint": "^4.8.0",
-    "husky": "^0.14.3",
-    "npm-run-all": "^4.1.1",
-    "gh-badges": "^1.3.0",
-    "xml2js": "^0.4.19"
-  },
-  "eslintConfig": {
-    "extends": "eslint:recommended",
-    "rules": {
-      "quotes": [2, "double"],
-      "no-undef": "off",
-      "no-useless-escape": "off",
-      "no-console": "off"
-    }
-  },
-  "eslintIgnore": [
-    "**/node_modules/**"
-  ]
+    "@vimlet/alpha": "0.0.18"
+  }
 }
