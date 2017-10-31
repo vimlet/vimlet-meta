@@ -2,7 +2,7 @@ exports.instance = function() {
 
 // MODE: INTERPRETER
 // - client (browser)
-// - server (node | nashorn)
+// - server (node)
 //
 // MODE: COMMAND	(node)
 
@@ -16,7 +16,7 @@ vimlet.meta = vimlet.meta || {};
   var require_fs;
   var require_vm;
 
-  // Engine [browser, node, nashorn]
+  // Engine [browser, node]
   vimlet.meta.engine = vimlet.meta.engine || "browser";
 
   // Tags Array [tagOpen, tagClose, tagEcho]
@@ -25,25 +25,25 @@ vimlet.meta = vimlet.meta || {};
   //Line break replacement
   vimlet.meta.lineBreak = vimlet.meta.lineBreak || null;
 
-  vimlet.meta.parse = function (text, data, callback, context) {
+  vimlet.meta.parse = function (scope, text, data, callback) {
     vimlet.meta.__setTags();
-    var __sandbox = vimlet.meta.__createSandbox(context);
+    var __sandbox = vimlet.meta.__createSandbox(scope);
     __sandbox.data = data || {};
     var result = __sandbox.__parse(text);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
   };
 
-  vimlet.meta.parseTemplate = function (template, data, callback, context) {
+  vimlet.meta.parseTemplate = function (scope, template, data, callback) {
     vimlet.meta.__setTags();
-    var __sandbox = vimlet.meta.__createSandbox(context);
+    var __sandbox = vimlet.meta.__createSandbox(scope);
     __sandbox.data = data || {};
     var result = __sandbox.__parseTemplate(template);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
   };
 
-  // Intialize tags
+  // Initialize tags
   vimlet.meta.__setTags = function () {
     // Tags
     vimlet.meta.__tagOpen = vimlet.meta.tags[0];
@@ -62,12 +62,12 @@ vimlet.meta = vimlet.meta || {};
     );
   };
 
-  //Esacape special characters from tags
+  // Escape special characters from tags
   vimlet.meta.__escapeRegExp = function (str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
   };
 
-  //Sanitize given string.
+  // Sanitize given string.
   vimlet.meta.sanitize = function (s) {
     s = s.replace(vimlet.meta.__tagOpen, "");
     s = s.replace(vimlet.meta.__tagClose, "");
@@ -93,14 +93,6 @@ vimlet.meta = vimlet.meta || {};
       } else {
         // Must be synchronous
         return require_fs.readFileSync(path, "utf8").toString();
-      }
-    } else if (vimlet.meta.engine == "nashorn") {
-      // TODO nashorn get file
-
-      if (callback) {
-        // Must be asynchronous
-      } else {
-        // Must be synchronous
       }
     } else {
       // TODO replace XMLHttpRequest by window.fetch with synchronous support
@@ -133,7 +125,7 @@ vimlet.meta = vimlet.meta || {};
     }
   };
 
-  vimlet.meta.__createSandbox = function (context) {
+  vimlet.meta.__createSandbox = function (scope) {
     var sandbox = eval.call(null, "this");
 
     if (vimlet.meta.engine == "node") {
@@ -159,8 +151,6 @@ vimlet.meta = vimlet.meta || {};
       baseContext.__dirname = __dirname;
 
       sandbox = new require_vm.createContext(baseContext);
-    } else if (vimlet.meta.engine == "nashorn") {
-      // TODO nashorn sandbox
     } else {
       // Browser sandbox
       iframe = document.createElement("iframe");
@@ -173,9 +163,9 @@ vimlet.meta = vimlet.meta || {};
       sandbox = iframe.contentWindow;
     }
 
-    // Inject context
-    if (context) {
-      sandbox.context = context;
+    // Inject scope
+    if (scope) {
+      sandbox.context = scope;
     }
 
     // Inject sandbox functions
@@ -214,8 +204,6 @@ vimlet.meta = vimlet.meta || {};
       if (vimlet.meta.engine == "node") {
         var script = new require_vm.Script(s);
         script.runInContext(sandbox);
-      } else if (vimlet.meta.engine == "nashorn") {
-        // TODO nashorn eval
       } else {
         sandbox.eval.call(null, s);
       }
