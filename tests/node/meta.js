@@ -21,7 +21,7 @@ var output = "resources/output";
 
 
 //New way
- meta.parse(templates, exclude, output, data, null, function(){console.log("Done");});
+ meta.parse(null, templates, exclude, output, data, null, function(){console.log("Done");});
 
 
 

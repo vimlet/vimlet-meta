@@ -7,6 +7,9 @@ var meta = require("./lib/meta-base");
 var commons = require("@vimlet/commons");
 var metaInstance = meta.instance();
 
+// @property lib [Access to meta]
+exports.lib = meta;
+
 // Meta node config
 metaInstance.engine = "node";
 
@@ -36,7 +39,7 @@ var globalCallback = null;
  * @param  {[type]} data     [description]
  * @return {[type]}          [description]
  */
-exports.parse = function(include, exclude, output, data, clean, callback) {
+exports.parse = function(scope, include, exclude, output, data, clean, callback) {
   globalCallback = callback;
   clean = clean || true;
   if (clean) {
@@ -56,7 +59,7 @@ exports.parse = function(include, exclude, output, data, clean, callback) {
           var currentOutput = path.join(output, template);
           currentOutput = path.join(path.dirname(currentOutput), path.basename(currentOutput, path.extname(currentOutput))); //Remove template extension
           metaInstance.parseTemplate(
-            null,
+            scope,
             currentTemplate,
             dataFile,
             function(result) {
@@ -110,7 +113,7 @@ if (!module.parent) {
   var output = program.output || path.join(cwd, "output");
   var data = program.data || {};
 
-  exports.parse(include, program.exclude, output, data, program.clean);
+  exports.parse(null, include, program.exclude, output, data, program.clean);
 
 }
 
