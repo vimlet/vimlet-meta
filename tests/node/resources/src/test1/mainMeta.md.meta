@@ -1,2 +1,4 @@
 Meta markdown template
 <%= "I'm Meta" %>
+
+<%= data.name %>

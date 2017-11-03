@@ -23,6 +23,7 @@ vimlet.meta = vimlet.meta || {};
   //Line break replacement
   vimlet.meta.lineBreak = vimlet.meta.lineBreak || null;
 
+
   vimlet.meta.parse = function (scope, text, data, callback) {
     vimlet.meta.__setTags();
     var __sandbox = vimlet.meta.__createSandbox(scope);
