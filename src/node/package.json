@@ -1,10 +1,13 @@
 {
   "name": "@vimlet/meta",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "author": "",
   "license": "UNLICENSED",
+  "bin": {
+    "vimlet-meta": "./index.js"
+  },
   "dependencies": {
     "fs-extra": "^4.0.1",
     "commander": "^2.9.0",
