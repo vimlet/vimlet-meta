@@ -170,7 +170,7 @@ if (!module.parent) {
   var include = program.include || [
     path.join(cwd, "**/*.vmt"),
   ];
-  var output = program.output || path.join(cwd, "output");
+  var output = program.output || path.resolve(cwd);
   var data = program.data || {};
   var exclude = program.exclude || defaultExclude;
   var clean = program.clean || true;
