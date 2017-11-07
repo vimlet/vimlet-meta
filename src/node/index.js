@@ -32,6 +32,9 @@ var filesToWrite = 0;
 var globalCallback = null;
 
 
+//@property defaultExclude {string[]} [node_modules folders are excluded by default if the user doesn't specify any exclude at all]
+var defaultExclude = ["**/node_modules/**"];
+
 /*
 @function parseTemplateWrite (public) [Parse all templates in include and write them to disk]
 @param include {[string]} [Included template patterns]
@@ -165,13 +168,14 @@ if (!module.parent) {
     .parse(process.argv);
 
   var include = program.include || [
-    path.join(cwd, "**/*.*"),
+    path.join(cwd, "**/*.vmt"),
   ];
   var output = program.output || path.join(cwd, "output");
   var data = program.data || {};
+  var exclude = program.exclude || defaultExclude;
+  var clean = program.clean || true;
 
-  exports.parse(null, include, program.exclude, output, data, program.clean);
-
+  exports.parseTemplateWrite(null, include, exclude, output, data, clean);
 }
 
 
