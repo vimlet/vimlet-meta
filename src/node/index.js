@@ -46,7 +46,6 @@ var defaultExclude = ["**/node_modules/**"];
  */
 exports.parseTemplateWrite = function(scope, include, exclude, output, data, clean, callback) {
   globalCallback = callback;
-  clean = clean || true;
   if (clean) {
     commons.io.deleteFolderRecursive(output);
   }
@@ -154,7 +153,7 @@ if (!module.parent) {
     .option("-e, --exclude <items>", "Exclude sub folders", list)
     .option("-o, --output <item>", "Add output")
     .option("-d, --data <item, item...>", "Add data.", list)
-    .option("-c, --clean", "Empty directory before generate")
+    .option("-c, --clean <item>", "Empty directory before generate")
     .on("--help", function() {
       console.log();
       console.log("  Examples:");
@@ -173,7 +172,7 @@ if (!module.parent) {
   var output = program.output || path.resolve(cwd);
   var data = program.data || {};
   var exclude = program.exclude || defaultExclude;
-  var clean = program.clean || true;
+  var clean = program.clean || false;
 
   exports.parseTemplateWrite(null, include, exclude, output, data, clean);
 }
