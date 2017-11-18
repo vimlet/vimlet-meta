@@ -311,7 +311,7 @@ exports.instance = function() {
         var endOfLine = "";
         
         // Return endOfLine if echo found
-        if (match.match(new RegExp("(^" + vimlet.meta.__tagOpen + vimlet.meta.__tagEcho +  "|echo(.*);)", "g"))) {
+        if (match.match(new RegExp("(^" + vimlet.meta.__tagOpen + vimlet.meta.__tagEcho +  "|echo(.*);|template(.*);)", "g"))) {
           
           // Determine match end of line
           var endsWithNewLine = match.match(new RegExp("(\\r\\n$|\\r$|\\n$)", "g"));
