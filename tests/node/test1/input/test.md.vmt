@@ -1,0 +1,8 @@
+# Test Example
+
+## Test echo
+<% var world = "World"; %>
+Hello <%= world %>
+
+## Test import template
+<% template("import/template1"); %>
