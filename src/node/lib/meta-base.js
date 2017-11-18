@@ -1,8 +1,6 @@
 exports.instance = function() {
 
-exports.instance = function() {
-  
-  // MODE: INTERPRETER
+ // MODE: INTERPRETER
   // - client (browser)
   // - server (node)
   //
@@ -303,11 +301,6 @@ exports.instance = function() {
       return match;
     };
   }.apply(vimlet.meta));
-  
-  
-  return vimlet.meta;
-  
-  }
 
 return vimlet.meta;
 
