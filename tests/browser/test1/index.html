@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="vimlet-meta.js"></script>
+</head>
+
+<body>
+
+    Hello
+    <span id="world"></span>
+
+    <div id="template"></div>
+
+    <script>
+        var text = "";
+        text += "<% var world = 'World'; %>";
+        text += "<%= world %>";
+        
+        var data = null;
+
+        vimlet.meta.parse(null, text, data, function (result) {
+            document.querySelector("#world").innerHTML = result;
+        });
+
+        text = "";
+        text += "<% template('import/template1'); %>"
+        
+        vimlet.meta.parse(null, text, data, function (result) {
+            document.querySelector("#template").innerHTML = result;
+        });
+
+    </script>
+
+</body>
+
+</html>

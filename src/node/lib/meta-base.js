@@ -212,9 +212,13 @@ vimlet.meta = vimlet.meta || {};
       return sandbox.__output;
     };
 
-    sandbox.__parse = function (t) {
+    sandbox.__parse = function (t, templatePath) {
       var result = "";
       var evalResult = [];
+      
+      if(!templatePath) {
+        templatePath = "";
+      }
 
       // Eval matches
       var matches = t.match(vimlet.meta.__regex);
@@ -223,7 +227,7 @@ vimlet.meta = vimlet.meta || {};
         for (var i = 0; i < matches.length; i++) {
           matches[i] = vimlet.meta.__cleanMatch(matches[i]);
           evalResult.push(
-            sandbox.__eval(matches[i], vimlet.meta.__getBasePath(t))
+            sandbox.__eval(matches[i], vimlet.meta.__getBasePath(templatePath))
           );
         }
       }
@@ -245,11 +249,11 @@ vimlet.meta = vimlet.meta || {};
       return result;
     };
 
-    sandbox.__parseTemplate = function (t) {
+    sandbox.__parseTemplate = function (templatePath) {
       // Get file must be synchronous
-      var file = vimlet.meta.__getFile(t);
+      var tContent = vimlet.meta.__getFile(templatePath);
       // Call template parser
-      return sandbox.__parse(file);
+      return sandbox.__parse(tContent, templatePath);
     };
 
   };

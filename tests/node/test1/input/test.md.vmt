@@ -2,7 +2,7 @@
 
 ## Test echo
 <% var world = "World"; %>
-Hello <%= world %>
+Hello <%= world %> 
 
 ## Test import template
 <% template("import/template1"); %>

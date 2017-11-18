@@ -1,4 +1,3 @@
 Hello Vimlet
-
-## Test import template
+</br>
 <% template("a/template2"); %>
