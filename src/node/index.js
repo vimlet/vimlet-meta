@@ -6,6 +6,7 @@
 var meta = require("./lib/meta-base");
 var commons = require("@vimlet/commons");
 var metaInstance = meta.instance();
+var watch = require("./lib/watch");
 // @property lib (public) [Access to library]
 exports.lib = meta;
 
@@ -58,6 +59,9 @@ exports.parseTemplateWrite = function(scope, include, exclude, output, data, cle
         templates.files.forEach(function(template) {
           filesToWrite++;
           var currentTemplate = path.join(templates.root, template);
+          if (!templates.root) { // If there is no root, that means that we refer to a single file which should be written at output
+            template = path.basename(template);
+          }
           var currentOutput = path.join(output, template);
           currentOutput = path.join(path.dirname(currentOutput), path.basename(currentOutput, path.extname(currentOutput))); //Remove template extension
           var currentData = customizeData(currentTemplate, dataFile);
@@ -75,6 +79,10 @@ exports.parseTemplateWrite = function(scope, include, exclude, output, data, cle
   }
 };
 
+exports.watch = function(scope, include, exclude, output, data, clean, callback) {
+  watch.watch(include,exclude);
+};
+
 /*
 @function parseTemplate (public) [Parse all templates in include and callback with result for each one]
 @param include {[string]} [Included template patterns]
@@ -87,11 +95,9 @@ exports.parseTemplate = function(scope, include, exclude, data, callback, argv) 
   var dataFile = getDataFile(data);
   var allTemplates = commons.io.getFiles(include, exclude);
   if (allTemplates.length > 0) {
-    filesToWrite = 0;
     allTemplates.forEach(function(templates) {
       if (templates.files.length > 0) {
         templates.files.forEach(function(template) {
-          filesToWrite++;
           var currentTemplate = path.join(templates.root, template);
           var currentData = customizeData(currentTemplate, dataFile);
           metaInstance.parseTemplate(
@@ -153,7 +159,8 @@ if (!module.parent) {
     .option("-e, --exclude <items>", "Exclude sub folders", list)
     .option("-o, --output <item>", "Add output")
     .option("-d, --data <item, item...>", "Add data.", list)
-    .option("-c, --clean <item>", "Empty directory before generate")
+    .option("-c, --clean", "Empty directory before generate")
+    .option("-w, --watch", "Watch directory for changes")
     .on("--help", function() {
       console.log();
       console.log("  Examples:");
@@ -174,7 +181,11 @@ if (!module.parent) {
   var exclude = program.exclude || defaultExclude;
   var clean = program.clean || false;
 
-  exports.parseTemplateWrite(null, include, exclude, output, data, clean);
+  if (program.watch) {
+    console.log("watch"); //TODO
+  } else {
+    exports.parseTemplateWrite(null, include, exclude, output, data, clean);
+  }
 }
 
 
