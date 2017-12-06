@@ -80,7 +80,9 @@ exports.parseTemplateWrite = function(scope, include, exclude, output, data, cle
 };
 
 exports.watch = function(scope, include, exclude, output, data, clean, callback) {
-  watch.watch(include,exclude);
+  exports.parseTemplateWrite(scope, include, exclude, output, data, clean, function(){
+    watch.watch(include,exclude,output,data);
+  });
 };
 
 /*
