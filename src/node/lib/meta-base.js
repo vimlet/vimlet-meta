@@ -10,7 +10,7 @@ exports.instance = function() {
   var vimlet = vimlet || {};
 
     vimlet.meta = vimlet.meta || {};
-  
+
     (function () {
       // Node require
       var require_fs;
