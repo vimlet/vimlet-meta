@@ -26,8 +26,16 @@ vimlet.meta = vimlet.meta || {};
   //Line break replacement
   vimlet.meta.lineBreak = vimlet.meta.lineBreak || null;
 
+  // Decode html
+  vimlet.meta.decodeHTML = vimlet.meta.decodeHTML || true;
+  vimlet.meta.__decodeEntityRegex = /&(?:#x[a-f0-9]+|#[0-9]+|[a-z0-9]+);?/ig;
 
   vimlet.meta.parse = function (scope, text, data, callback) {
+
+    if (vimlet.meta.decodeHTML) {
+      text = vimlet.meta.__decodeHTMLEntities(text);
+    }
+
     vimlet.meta.__setTags();
     var __sandbox = vimlet.meta.__createSandbox(scope);
     __sandbox.data = data || {};
@@ -44,6 +52,34 @@ vimlet.meta = vimlet.meta || {};
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
   };
+
+  // Decode html entities
+  vimlet.meta.__decodeHTMLEntities = function (str) {
+
+    if (vimlet.meta.engine === "browser") {
+
+      if (!vimlet.meta.__decodeElement) {
+        vimlet.meta.__decodeElement = document.createElement("div");
+      }
+
+      if (str && typeof str === "string") {
+
+        // find and replace all the html entities
+        str = str.replace(vimlet.meta.__decodeEntityRegex, function(match) {
+          vimlet.meta.__decodeElement.innerHTML = match;
+          return vimlet.meta.__decodeElement.textContent;
+        });
+
+        // reset the value
+        vimlet.meta.__decodeElement.textContent = "";
+
+      }
+
+    }
+
+    return str;
+
+  }
 
   // Initialize tags
   vimlet.meta.__setTags = function () {
@@ -269,22 +305,22 @@ vimlet.meta = vimlet.meta || {};
       // Get file must be synchronous
       var tContent = vimlet.meta.__getFile(templatePath);
       // Call template parser with wrapped in tags since its code that must run inside sandboxed scope
-      return sandbox.__parse(vimlet.meta.tags[0] + " " + tContent  + " " +  vimlet.meta.tags[1], templatePath);
+      return sandbox.__parse(vimlet.meta.tags[0] + " " + tContent + " " + vimlet.meta.tags[1], templatePath);
     };
 
     // Inject custom properties so they are available to the sandbox
-    if( vimlet.meta.sandbox) {
+    if (vimlet.meta.sandbox) {
       var customSandboxKeys = Object.keys(vimlet.meta.sandbox);
       var key;
       var value;
       for (var i = 0; i < customSandboxKeys.length; i++) {
         key = customSandboxKeys[i];
         value = vimlet.meta.sandbox[key];
-        if(typeof value === "function") {
+        if (typeof value === "function") {
           // Inject sandbox scope if its a function
-          sandbox[key] = function() { 
+          sandbox[key] = function () {
             value.apply(sandbox, arguments);
-          };        
+          };
         } else {
           // Inject directly for any other property
           sandbox[key] = value;
@@ -332,16 +368,16 @@ vimlet.meta = vimlet.meta || {};
     }
 
     // Allow the creation of custom shortcuts
-    if(vimlet.meta.shortcut) {
+    if (vimlet.meta.shortcut) {
       var shortcutKeys = Object.keys(vimlet.meta.shortcut);
       var shortcutTag;
       var shortcutHandler;
       for (var i = 0; i < shortcutKeys.length; i++) {
         shortcutTag = shortcutKeys[i];
         shortcutHandler = vimlet.meta.shortcut[shortcutTag];
-        if(match.indexOf(shortcutTag, 0) === 0) {
-            match = shortcutHandler(match.substring(shortcutTag.length, match.length).trim());         
-        }                
+        if (match.indexOf(shortcutTag, 0) === 0) {
+          match = shortcutHandler(match.substring(shortcutTag.length, match.length).trim());
+        }
       }
     }
 
