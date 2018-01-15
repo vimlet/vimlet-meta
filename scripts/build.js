@@ -21,6 +21,6 @@ fs.writeFileSync(
 // --- Build browser ---
 
 fs.writeFileSync(
-  path.join(__dirname, "../src/browser/vimlet-meta.js"),
+  path.join(__dirname, "../src/browser/vmeta.js"),
   baseFile
 );
