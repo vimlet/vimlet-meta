@@ -1,6 +1,6 @@
 var watch = require('glob-watcher');
 var path = require("path");
-var commons = require("../node_modules/@vimlet/commons");
+var commons = require("@vimlet/commons");
 var meta = require("../index.js");
 var fs = require("fs-extra");
 
