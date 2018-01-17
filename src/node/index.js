@@ -79,7 +79,7 @@ exports.parseTemplateWrite = function(scope, include, exclude, output, data, cle
   }
 };
 
-exports.watch = function(scope, include, exclude, output, data, clean, callback) {
+exports.watch = function(scope, include, exclude, output, data, clean) {
   exports.parseTemplateWrite(scope, include, exclude, output, data, clean, function(){
     watch.watch(include,exclude,output,data);
   });
@@ -184,7 +184,7 @@ if (!module.parent) {
   var clean = program.clean || false;
 
   if (program.watch) {
-    console.log("watch"); //TODO
+    exports.watch(null, include, exclude, output, data, clean);
   } else {
     exports.parseTemplateWrite(null, include, exclude, output, data, clean);
   }
