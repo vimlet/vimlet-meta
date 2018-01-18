@@ -44,8 +44,9 @@ var defaultExclude = ["**/node_modules/**"];
 @param data {[string]} [Data object, folder or array of folders to search for data]
 @param clean {boolean} [Empty ouput folder before parse]
 @param callback
- */
+*/
 exports.parseTemplateWrite = function(scope, include, exclude, output, data, clean, callback) {
+var glob = require("glob");
   globalCallback = callback;
   if (clean) {
     commons.io.deleteFolderRecursive(output);
@@ -57,23 +58,27 @@ exports.parseTemplateWrite = function(scope, include, exclude, output, data, cle
     allTemplates.forEach(function(templates) {
       if (templates.files.length > 0) {
         templates.files.forEach(function(template) {
-          filesToWrite++;
-          var currentTemplate = path.join(templates.root, template);
-          if (!templates.root) { // If there is no root, that means that we refer to a single file which should be written at output
-            template = path.basename(template);
-          }
-          var currentOutput = path.join(output, template);
-          currentOutput = path.join(path.dirname(currentOutput), path.basename(currentOutput, path.extname(currentOutput))); //Remove template extension
-          var currentData = customizeData(currentTemplate, dataFile);
-          metaInstance.parseTemplate(
-            scope,
-            currentTemplate,
-            currentData,
-            function(result) {
-              writeToDisk(currentOutput, result, parseCallback);
+          if(!commons.io.isDirectory(path.join(templates.root, template))){
+            filesToWrite++;
+            var currentTemplate = path.join(templates.root, template);
+            if (!templates.root) { // If there is no root, that means that we refer to a single file which should be written at output
+              template = path.basename(template);
             }
-          );
+            var currentOutput = path.join(output, template);
+            currentOutput = path.join(path.dirname(currentOutput), path.basename(currentOutput, path.extname(currentOutput))); //Remove template extension
+            var currentData = customizeData(currentTemplate, dataFile);
+            metaInstance.parseTemplate(
+              scope,
+              currentTemplate,
+              currentData,
+              function(result) {
+                writeToDisk(currentOutput, result, parseCallback);
+              }
+            );
+          }
         });
+      }else{
+        callback();
       }
     });
   }
@@ -141,8 +146,8 @@ exports.parse = function(scope, templateData, data, callback) {
 
 
 /*
-  @function parseCallback (private) [Callback when a doc is written to disk]
-   */
+@function parseCallback (private) [Callback when a doc is written to disk]
+*/
 function parseCallback() {
   filesToWrite--;
   if (filesToWrite <= 0) {
@@ -156,24 +161,24 @@ function parseCallback() {
 // Command mode
 if (!module.parent) {
   program
-    .version("0.0.1")
-    .option("-i, --include <item, item...>", "Work folders", list)
-    .option("-e, --exclude <items>", "Exclude sub folders", list)
-    .option("-o, --output <item>", "Add output")
-    .option("-d, --data <item, item...>", "Add data.", list)
-    .option("-c, --clean", "Empty directory before generate")
-    .option("-w, --watch", "Watch directory for changes")
-    .on("--help", function() {
-      console.log();
-      console.log("  Examples:");
-      console.log("vimlet-meta -i **/*.* -o output");
-      console.log("vimlet-meta");
-      console.log(
-        "Both examples do the same cause the first one is default config"
-      );
-      console.log();
-    })
-    .parse(process.argv);
+  .version("0.0.1")
+  .option("-i, --include <item, item...>", "Work folders", list)
+  .option("-e, --exclude <items>", "Exclude sub folders", list)
+  .option("-o, --output <item>", "Add output")
+  .option("-d, --data <item, item...>", "Add data.", list)
+  .option("-c, --clean", "Empty directory before generate")
+  .option("-w, --watch", "Watch directory for changes")
+  .on("--help", function() {
+    console.log();
+    console.log("  Examples:");
+    console.log("vimlet-meta -i **/*.* -o output");
+    console.log("vimlet-meta");
+    console.log(
+      "Both examples do the same cause the first one is default config"
+    );
+    console.log();
+  })
+  .parse(process.argv);
 
   var include = program.include || [
     path.join(cwd, "**/*.vmt"),
@@ -194,7 +199,7 @@ if (!module.parent) {
 /*
 @function getDataFile (private) {object} [Read data from files]
 @param data {[string]} [Data can be: Object, folder, pattern or an array of folders or patterns]
- */
+*/
 function getDataFile(data) {
   if (!Array.isArray(data) && typeof data === "object") {
     return data;
@@ -209,7 +214,7 @@ function getDataFile(data) {
 @param output {string} [Output folder]
 @param result {string} [Data to write]
 @param callback
- */
+*/
 function writeToDisk(output, result, callback) {
   fs.mkdirp(getDirName("" + output), function(err) {
     if (err) {
@@ -237,7 +242,7 @@ function writeToDisk(output, result, callback) {
 /*
 @function readData (private) {object} [Read data from an array of files and merge them]
 @param dataPath {[string]} [Array of paths]
- */
+*/
 function readData(dataPath) {
   var dataFile = {};
   for (var i = 0; i < dataPath.length; i++) {
@@ -270,7 +275,7 @@ function readData(dataPath) {
 @function customizeData (private) {object} [Check in data if current template has special keys]
 @param template
 @param data
- */
+*/
 function customizeData(template, data) {
   if (data) {
     // Unlink data with current custom data
@@ -308,7 +313,7 @@ function customizeData(template, data) {
 @function merge {object} (private) [Merge two objects]
 @param obj {object}
 @param src {object}
- */
+*/
 function merge(obj, src) {
   Object.keys(src).forEach(function(key) {
     obj[key] = src[key];
