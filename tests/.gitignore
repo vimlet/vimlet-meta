@@ -1,2 +1,4 @@
 /report.xml
 /node/output
+/node_modules
+/npm-debug.log

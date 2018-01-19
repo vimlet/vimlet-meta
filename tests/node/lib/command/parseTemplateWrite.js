@@ -1,5 +1,5 @@
 var path = require("path");
-var commons = require("../../../../src/node/node_modules/@vimlet/commons");
+var commons = require("@vimlet/commons");
 
 
 // Vimlet meta command

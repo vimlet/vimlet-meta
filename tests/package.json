@@ -1,0 +1,14 @@
+{
+    "name": "tests",
+    "version": "0.0.1",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+    },
+    "dependencies": {
+      "@vimlet/commons": "2.5.11"
+    },
+    "author": "",
+    "license": "UNLICENSED"
+  }
+  
