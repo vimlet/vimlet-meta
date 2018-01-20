@@ -8,13 +8,7 @@ module.exports.engine = "node";
 var baseParse = module.exports.parse;
 
 module.exports.parse = function () {
-  if(arguments.length == baseParse.length) {
-    // Normal behaviour with node standard callback
     convertToNodeCallback(baseParse).apply(null, arguments);
-  }else {
-    // Overload code here
-    // callOverloadedFunctionHere();
-  }
 };
 
 // Converts any callback to a standard(error, data) callback
