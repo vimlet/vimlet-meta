@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 var commons = require("@vimlet/commons");
 var path = require("path");
 var glob = require("glob");
