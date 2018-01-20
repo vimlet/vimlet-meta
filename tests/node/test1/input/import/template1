@@ -1,7 +1,0 @@
-Hello Vimlet
-
-## Test import template
-<% template("a/template2"); %>
-
-## Test import newLinePreserve
-<% template("a/template3"); %>
