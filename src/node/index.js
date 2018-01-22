@@ -98,27 +98,24 @@ if (!module.parent) {
   }
 
   cli
-    .value("-i, --include", list)
-    .value("-e, --exclude", list)
-    .value("-o, --output")
-    .value("-d, --data", list)
-    .value("-c, --clean")
-    .value("-w, --watch")
+    .value("-i", "--include", "", list)
+    .value("-e", "--exclude", "", list)
+    .value("-o", "--output", "")
+    .value("-d", "--data", "", list)
+    .value("-c", "--clean", "")
+    .flag("-w", "--watch", "")
     .parse(process.argv);
 
+  // cli.printHelp();
 
   var cwd = process.cwd();
+  var include = cli.result.include || "**/*.vmt";
+  var exclude = cli.result.exclude || "**node_modules**";
+  var data = cli.result.data || {};
+  var output = cli.result.output || cwd;
+  var clean = cli.result.clean || false;
 
-  var include = cli.include || [
-    path.join(cwd, "**/*.vmt"),
-  ];
-
-  var output = cli.output || path.resolve(cwd);
-  var data = cli.data || {};
-  var exclude = cli.exclude || "**node_modules**";
-  var clean = cli.clean || false;
-
-  if (cli.watch) {
+  if (cli.result.watch) {
     module.exports.watch(null, include, exclude, data, output, clean);
   } else {
     module.exports.parseTemplateGlobAndWrite(null, include, exclude, data, output, clean);
