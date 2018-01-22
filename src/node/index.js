@@ -4,6 +4,7 @@ var commons = require("@vimlet/commons");
 var path = require("path");
 var glob = require("glob");
 var fs = require("fs-extra");
+var program = require("commander");
 
 // Make base accessible from the required scope
 module.exports = require("./lib/meta-base").instance();
@@ -14,6 +15,10 @@ module.exports.engine = "node";
 // Function overloading and node standard(error, data) callbacks 
 var baseParse = module.exports.parse;
 var baseParseTemplate = module.exports.parseTemplate;
+
+// Import watch option
+var watch = require("./lib/watch");
+
 
 // Converts any callback to a standard(error, data) callback
 // NOTE: Only single param callback is supported
@@ -57,6 +62,9 @@ module.exports.parseTemplateGlob = function(scope, include, exclude, data, callb
 };
 
 module.exports.parseTemplateGlobAndWrite = function(scope, include, exclude, data, output, clean) {
+  if (clean) {
+    commons.io.deleteFolderRecursive(output);
+  }
   module.exports.parseTemplateGlob(scope, include, exclude, data, function(error, data){
       if(error) {
         console.error(error);
@@ -71,7 +79,46 @@ module.exports.parseTemplateGlobAndWrite = function(scope, include, exclude, dat
   });
 };
 
+
+module.exports.watch = function(scope, include, exclude, data, output, clean) {
+  module.exports.parseTemplateGlobAndWrite(scope, include, exclude, data, output, clean);
+  watch.watch(include,exclude,data,output);
+};
+
+
 // Command mode
 if (!module.parent) {
-  // TODO
+  program
+    .version("0.0.1")
+    .option("-i, --include <item, item...>", "Work folders", list)
+    .option("-e, --exclude <items>", "Exclude sub folders", list)
+    .option("-o, --output <item>", "Add output")
+    .option("-d, --data <item, item...>", "Add data.", list)
+    .option("-c, --clean", "Empty directory before generate")
+    .option("-w, --watch", "Watch directory for changes")
+    .on("--help", function () {
+      console.log();
+      console.log("  Examples:");
+      console.log("vimlet-meta -i **/*.* -o output");
+      console.log("vimlet-meta");
+      console.log(
+        "Both examples do the same cause the first one is default config"
+      );
+      console.log();
+    })
+    .parse(process.argv);
+
+  var include = program.include || [
+    path.join(cwd, "**/*.vmt"),
+  ];
+  var output = program.output || path.resolve(cwd);
+  var data = program.data || {};
+  var exclude = program.exclude || defaultExclude;
+  var clean = program.clean || false;
+
+  if (program.watch) {
+    module.exports.watch(null, include, exclude, output, data, clean);
+  } else {
+    module.exports.parseTemplateGlobAndWrite(null, include, exclude, data, output, clean);
+  }
 }

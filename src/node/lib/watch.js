@@ -4,7 +4,7 @@ var commons = require("@vimlet/commons");
 var meta = require("../index.js");
 var fs = require("fs-extra");
 
-exports.watch = function(include, exclude, output, data) {
+exports.watch = function(include, exclude, data, output) {
   console.log("Watching:",include);
   var watcher = watch(include,{
     events: ['add', 'change', 'unlink', 'addDir', 'unlinkDir']
@@ -14,10 +14,9 @@ exports.watch = function(include, exclude, output, data) {
       // Relative output is where the template will be saved after parsed
       var relativeOutput = getRelativeOutput(include, output, filePath);
       // Parse modified file
-      meta.parseTemplateWrite(null, filePath, null, relativeOutput, data, false, function(){
-        console.log("File modified:");
-        console.log(filePath + " => " + path.join(relativeOutput,path.basename(filePath, path.extname(filePath))));
-      });
+      meta.parseTemplateGlobAndWrite(null, filePath, null, data, relativeOutput, false);
+      console.log("File modified:");
+      console.log(filePath + " => " + path.join(relativeOutput,path.basename(filePath, path.extname(filePath))));
     }
   });
   watcher.on('add', function(filePath, stat) {
@@ -25,10 +24,9 @@ exports.watch = function(include, exclude, output, data) {
       // Relative output is where the template will be saved after parsed
       var relativeOutput = getRelativeOutput(include, output, filePath);
       // Parse modified file
-      meta.parseTemplateWrite(null, filePath, null, relativeOutput, data, false, function(){
-        console.log("File added:");
-        console.log(filePath + " => " + path.join(relativeOutput, path.basename(filePath, path.extname(filePath))));
-      });
+      meta.parseTemplateGlobAndWrite(null, filePath, null, data, relativeOutput, false);
+      console.log("File added:");
+      console.log(filePath + " => " + path.join(relativeOutput, path.basename(filePath, path.extname(filePath))));
     }
   });
   watcher.on('unlink', function(filePath, stat) {
@@ -51,11 +49,16 @@ exports.watch = function(include, exclude, output, data) {
     });
   });
   watcher.on('unlinkDir', function(filePath, stat) {
+
+try{
     var relativeOutput = getRelativeOutput(include, output, filePath, true);
     fs.remove(path.join(relativeOutput, path.basename(filePath)), function(){
       console.log("Folder removed:");
       console.log(path.join(relativeOutput, path.basename(filePath)));
     });
+  }catch(e){}
+
+
   });
   watcher.on('error', function(error) {
     if (process.platform === 'win32' && error.code === 'EPERM') {
@@ -64,6 +67,8 @@ exports.watch = function(include, exclude, output, data) {
       //   if (!err) broadcastErr(error);
       // });
       console.log("ERROR","Deleting an empty folder doesn't fire on windows");
+      console.log(error);
+      
     } else {
       broadcastErr(error);
     }
@@ -106,6 +111,9 @@ function getRelativeOutput(include, output, filePath, deleted) {
 @return boolean
 */
 function isExcluded(excluded, filePath) {
+  if(!excluded){
+    return false;
+  }
   if (!Array.isArray(excluded)) {
     return commons.io.isInPattern(filePath, excluded);
   } else {
