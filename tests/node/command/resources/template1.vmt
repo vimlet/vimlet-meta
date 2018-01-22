@@ -1,1 +1,1 @@
-Hello i'm a template! <%= "AWESOME!" %>
+Hello i'm a template! <%= "AWESOME!" %> <%= data.name %>

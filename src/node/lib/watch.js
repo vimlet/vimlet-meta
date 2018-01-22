@@ -16,7 +16,7 @@ exports.watch = function(include, exclude, data, output) {
       // Parse modified file
       meta.parseTemplateGlobAndWrite(null, filePath, null, data, relativeOutput, false);
       console.log("File modified:");
-      console.log(filePath + " => " + path.join(relativeOutput,path.basename(filePath, path.extname(filePath))));
+      console.log(filePath + " => " + path.join(relativeOutput,path.basename(filePath, ".vmt")));
     }
   });
   watcher.on('add', function(filePath, stat) {
@@ -26,14 +26,14 @@ exports.watch = function(include, exclude, data, output) {
       // Parse modified file
       meta.parseTemplateGlobAndWrite(null, filePath, null, data, relativeOutput, false);
       console.log("File added:");
-      console.log(filePath + " => " + path.join(relativeOutput, path.basename(filePath, path.extname(filePath))));
+      console.log(filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
     }
   });
   watcher.on('unlink', function(filePath, stat) {
     if (!isExcluded(exclude, filePath)) {
       // Relative output is where the template will be saved after parsed
       var relativeOutput = getRelativeOutput(include, output, filePath, true);
-      var parsedPath = path.join(relativeOutput, path.basename(filePath,path.extname(filePath)));
+      var parsedPath = path.join(relativeOutput, path.basename(filePath, ".vmt"));
       if(fs.existsSync(parsedPath)){
         fs.unlinkSync(parsedPath);
         console.log("File deleted:");
@@ -49,26 +49,15 @@ exports.watch = function(include, exclude, data, output) {
     });
   });
   watcher.on('unlinkDir', function(filePath, stat) {
-
-try{
     var relativeOutput = getRelativeOutput(include, output, filePath, true);
     fs.remove(path.join(relativeOutput, path.basename(filePath)), function(){
       console.log("Folder removed:");
       console.log(path.join(relativeOutput, path.basename(filePath)));
     });
-  }catch(e){}
-
-
   });
   watcher.on('error', function(error) {
     if (process.platform === 'win32' && error.code === 'EPERM') {
-      // fs.open(path, 'r', function(err, fd) {
-      //   if (fd) fs.close(fd);
-      //   if (!err) broadcastErr(error);
-      // });
-      console.log("ERROR","Deleting an empty folder doesn't fire on windows");
-      console.log(error);
-      
+      console.log("Deleting an empty folder doesn't fire on windows");      
     } else {
       broadcastErr(error);
     }

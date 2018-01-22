@@ -98,27 +98,38 @@ if (!module.parent) {
   }
 
   cli
-    .value("-i", "--include", "", list)
-    .value("-e", "--exclude", "", list)
-    .value("-o", "--output", "")
-    .value("-d", "--data", "", list)
-    .value("-c", "--clean", "")
-    .flag("-w", "--watch", "")
+    .value("-i", "--include", "Include patterns", list)
+    .value("-e", "--exclude", "Exclude patterns", list)
+    .value("-o", "--output", "Output path")
+    .value("-d", "--data", "Json file path")
+    .flag("-c", "--clean", "Clean output directory")
+    .flag("-w", "--watch", "Keeps watching for changes")
+    .flag("-h", "--help", "Shows help")
     .parse(process.argv);
 
-  // cli.printHelp();
-
   var cwd = process.cwd();
+  
+  var readData = null;
+  if(cli.result.data){
+    if(fs.existsSync(path.join(cwd,cli.result.data))){
+      readData = JSON.parse(fs.readFileSync(path.join(cwd,cli.result.data)));
+    }
+  }
+
   var include = cli.result.include || "**/*.vmt";
   var exclude = cli.result.exclude || "**node_modules**";
-  var data = cli.result.data || {};
+  var data = readData || {};
   var output = cli.result.output || cwd;
   var clean = cli.result.clean || false;
 
-  if (cli.result.watch) {
-    module.exports.watch(null, include, exclude, data, output, clean);
-  } else {
-    module.exports.parseTemplateGlobAndWrite(null, include, exclude, data, output, clean);
+  if(cli.result.help){
+    cli.printHelp();
+  }else{
+    if (cli.result.watch) {
+      module.exports.watch(null, include, exclude, data, output, clean);
+    } else {
+      module.exports.parseTemplateGlobAndWrite(null, include, exclude, data, output, clean);
+    }
   }
 
 }
