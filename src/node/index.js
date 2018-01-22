@@ -4,7 +4,7 @@ var commons = require("@vimlet/commons");
 var path = require("path");
 var glob = require("glob");
 var fs = require("fs-extra");
-var program = require("commander");
+var cli = require("@vimlet/cli").instantiate();
 
 // Make base accessible from the required scope
 module.exports = require("./lib/meta-base").instance();
@@ -63,7 +63,7 @@ module.exports.parseTemplateGlob = function(scope, include, exclude, data, callb
 
 module.exports.parseTemplateGlobAndWrite = function(scope, include, exclude, data, output, clean) {
   if (clean) {
-    commons.io.deleteFolderRecursive(output);
+    fs.removeSync(output);
   }
   module.exports.parseTemplateGlob(scope, include, exclude, data, function(error, data){
       if(error) {
@@ -88,37 +88,40 @@ module.exports.watch = function(scope, include, exclude, data, output, clean) {
 
 // Command mode
 if (!module.parent) {
-  program
-    .version("0.0.1")
-    .option("-i, --include <item, item...>", "Work folders", list)
-    .option("-e, --exclude <items>", "Exclude sub folders", list)
-    .option("-o, --output <item>", "Add output")
-    .option("-d, --data <item, item...>", "Add data.", list)
-    .option("-c, --clean", "Empty directory before generate")
-    .option("-w, --watch", "Watch directory for changes")
-    .on("--help", function () {
-      console.log();
-      console.log("  Examples:");
-      console.log("vimlet-meta -i **/*.* -o output");
-      console.log("vimlet-meta");
-      console.log(
-        "Both examples do the same cause the first one is default config"
-      );
-      console.log();
-    })
+
+  function list(value) {
+    var result = value.split(",");
+    for (var i = 0; i < result.length; i++) {
+      result[i] = result[i].trim();
+    }
+    return result;
+  }
+
+  cli
+    .value("-i, --include", list)
+    .value("-e, --exclude", list)
+    .value("-o, --output")
+    .value("-d, --data", list)
+    .value("-c, --clean")
+    .value("-w, --watch")
     .parse(process.argv);
 
-  var include = program.include || [
+
+  var cwd = process.cwd();
+
+  var include = cli.include || [
     path.join(cwd, "**/*.vmt"),
   ];
-  var output = program.output || path.resolve(cwd);
-  var data = program.data || {};
-  var exclude = program.exclude || defaultExclude;
-  var clean = program.clean || false;
 
-  if (program.watch) {
-    module.exports.watch(null, include, exclude, output, data, clean);
+  var output = cli.output || path.resolve(cwd);
+  var data = cli.data || {};
+  var exclude = cli.exclude || "**node_modules**";
+  var clean = cli.clean || false;
+
+  if (cli.watch) {
+    module.exports.watch(null, include, exclude, data, output, clean);
   } else {
     module.exports.parseTemplateGlobAndWrite(null, include, exclude, data, output, clean);
   }
+
 }
