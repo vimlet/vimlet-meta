@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {},
   "dependencies": {
+    "@vimlet/cli": "1.0.0",
     "@vimlet/commons": "2.5.11"
   },
   "author": "",
