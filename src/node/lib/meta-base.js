@@ -229,13 +229,13 @@ vimlet.meta = vimlet.meta || {};
     sandbox.__basePath = "";
 
     sandbox.echo = function (s) {
-      sandbox.__output += s;
+      sandbox.__output = s;
     };
 
     sandbox.template = function (t) {
       var __fullPath = sandbox.__basePath + "/" + t;
       var parsedTemplate = sandbox.__parseTemplate(__fullPath);
-      sandbox.__output += parsedTemplate;
+      sandbox.__output = parsedTemplate;
     };
 
     sandbox.include = function (t) {

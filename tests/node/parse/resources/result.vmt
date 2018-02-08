@@ -1,2 +1,3 @@
 Hello i'm result <%= "AWESOME!" %>
 <% template("template1.vmi"); %>
+This is an echo test <%= "AWESOME!" %> <%= "YEP!" %>
