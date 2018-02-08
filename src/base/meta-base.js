@@ -227,7 +227,7 @@ vimlet.meta = vimlet.meta || {};
     sandbox.__basePath = "";
 
     sandbox.echo = function (s) {
-      sandbox.__output = s;
+      sandbox.__output += s;
     };
 
     sandbox.template = function (t) {
