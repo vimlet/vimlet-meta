@@ -5,6 +5,7 @@ var path = require("path");
 var glob = require("glob");
 var fs = require("fs-extra");
 var cli = require("@vimlet/cli").instantiate();
+var watch = require("./lib/watch");
 
 // Make base accessible from the required scope
 module.exports = require("./lib/meta-base").instance();
@@ -15,10 +16,6 @@ module.exports.engine = "node";
 // Function overloading and node standard(error, data) callbacks 
 var baseParse = module.exports.parse;
 var baseParseTemplate = module.exports.parseTemplate;
-
-// Import watch option
-var watch = require("./lib/watch");
-
 
 // Converts any callback to a standard(error, data) callback
 // NOTE: Only single param callback is supported

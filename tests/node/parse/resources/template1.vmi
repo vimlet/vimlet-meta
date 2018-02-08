@@ -1,0 +1,4 @@
+I'm template1
+<% template("template2.vmi"); %>
+<% template("template3.vmi"); %>
+End
