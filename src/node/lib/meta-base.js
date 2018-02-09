@@ -67,7 +67,7 @@ vimlet.meta = vimlet.meta || {};
       if (str && typeof str === "string") {
 
         // find and replace all the html entities
-        str = str.replace(vimlet.meta.__decodeEntityRegex, function(match) {
+        str = str.replace(vimlet.meta.__decodeEntityRegex, function (match) {
           vimlet.meta.__decodeElement.innerHTML = match;
           return vimlet.meta.__decodeElement.textContent;
         });
@@ -209,7 +209,7 @@ vimlet.meta = vimlet.meta || {};
     }
 
     // Inject sandbox functions
-    vimlet.meta.__injectSanboxFunctions(sandbox);
+    vimlet.meta.__injectSandboxFunctions(sandbox);
 
     return sandbox;
   };
@@ -223,7 +223,7 @@ vimlet.meta = vimlet.meta || {};
     sandbox = null;
   };
 
-  vimlet.meta.__injectSanboxFunctions = function (sandbox) {
+  vimlet.meta.__injectSandboxFunctions = function (sandbox) {
     sandbox.__output = "";
 
     sandbox.__basePath = "";
@@ -259,30 +259,19 @@ vimlet.meta = vimlet.meta || {};
 
     sandbox.__parse = function (t, templatePath) {
       var result = "";
-      var evalResult = [];
 
       if (!templatePath) {
         templatePath = "";
       }
 
       // Eval matches
-      var matches = t.match(vimlet.meta.__regex);
       var endOfLine = "";
 
-      if (matches) {
-        for (var i = 0; i < matches.length; i++) {
-          endOfLine = vimlet.meta.__preserveNewLineIfNeeded(matches[i]);
-          matches[i] = vimlet.meta.__cleanMatch(matches[i]);
-          evalResult.push(
-            sandbox.__eval(matches[i], vimlet.meta.__getBasePath(templatePath)) + endOfLine
-          );
-        }
-      }
-
       // Replace template with evalMatches
-      var j = 0;
-      result = t.replace(vimlet.meta.__regex, function () {
-        return evalResult[j++]; // returns previous value
+      result = t.replace(vimlet.meta.__regex, function (match) {
+        endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);
+        match = vimlet.meta.__cleanMatch(match);
+        return sandbox.__eval(match, vimlet.meta.__getBasePath(templatePath)) + endOfLine;
       });
 
       //Replace line break.
@@ -359,8 +348,8 @@ vimlet.meta = vimlet.meta || {};
     // Remove tags
     match = match
       .substring(
-      vimlet.meta.__tagOpen.length,
-      match.length - vimlet.meta.__tagClose.length
+        vimlet.meta.__tagOpen.length,
+        match.length - vimlet.meta.__tagClose.length
       )
       .trim();
 
