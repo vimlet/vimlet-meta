@@ -235,7 +235,7 @@ vimlet.meta = vimlet.meta || {};
     sandbox.template = function (t) {
       var __fullPath = sandbox.__basePath + "/" + t;
       var parsedTemplate = sandbox.__parseTemplate(__fullPath);
-      sandbox.__output = parsedTemplate;
+      sandbox.__output += parsedTemplate;
     };
 
     sandbox.include = function (t) {
@@ -258,8 +258,6 @@ vimlet.meta = vimlet.meta || {};
     };
 
     sandbox.__parse = function (t, templatePath) {
-      var result = "";
-
       if (!templatePath) {
         templatePath = "";
       }
@@ -268,7 +266,7 @@ vimlet.meta = vimlet.meta || {};
       var endOfLine = "";
 
       // Replace template with evalMatches
-      result = t.replace(vimlet.meta.__regex, function (match) {
+      var result = t.replace(vimlet.meta.__regex, function (match) {
         endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);
         match = vimlet.meta.__cleanMatch(match);
         return sandbox.__eval(match, vimlet.meta.__getBasePath(templatePath)) + endOfLine;
