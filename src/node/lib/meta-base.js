@@ -259,8 +259,7 @@ vimlet.meta = vimlet.meta || {};
     };
 
     sandbox.__parse = function (t, templatePath) {
-
-      var providedTemplatePath = templatePath ? true : false;
+      var result = "";
 
       if (!templatePath) {
         templatePath = "";
@@ -270,7 +269,7 @@ vimlet.meta = vimlet.meta || {};
       var endOfLine = "";
 
       // Replace template with evalMatches
-      var result = t.replace(vimlet.meta.__regex, function (match) {
+      result = t.replace(vimlet.meta.__regex, function (match) {
         endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);
         match = vimlet.meta.__cleanMatch(match);
         return sandbox.__eval(match, vimlet.meta.__getBasePath(templatePath)) + endOfLine;
@@ -283,7 +282,7 @@ vimlet.meta = vimlet.meta || {};
           vimlet.meta.lineBreak
         );
       }
-      
+
       return result;
     };
 
