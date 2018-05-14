@@ -32,24 +32,25 @@ vimlet.meta = vimlet.meta || {};
   vimlet.meta.decodeHTML = vimlet.meta.decodeHTML || true;
   vimlet.meta.__decodeEntityRegex = /&(?:#x[a-f0-9]+|#[0-9]+|[a-z0-9]+);?/ig;
 
-  vimlet.meta.parse = function (scope, text, data, callback) {
-
+  vimlet.meta.parse = function (text, options, callback) {
+    options = options || {};
     if (vimlet.meta.decodeHTML) {
       text = vimlet.meta.__decodeHTMLEntities(text);
     }
 
     vimlet.meta.__setTags();
-    var __sandbox = vimlet.meta.__createSandbox(scope);
-    __sandbox.data = data || {};
+    var __sandbox = vimlet.meta.__createSandbox(options.scope);
+    __sandbox.data = options.data || {};
     var result = __sandbox.__parse(text);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
   };
 
-  vimlet.meta.parseTemplate = function (scope, template, data, callback) {
+  vimlet.meta.parseTemplate = function (template, options, callback) {
+    options = options || {};
     vimlet.meta.__setTags();
-    var __sandbox = vimlet.meta.__createSandbox(scope);
-    __sandbox.data = data || {};
+    var __sandbox = vimlet.meta.__createSandbox(options.scope);
+    __sandbox.data = options.data || {};
     var result = __sandbox.__parseTemplate(template);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);

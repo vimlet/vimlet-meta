@@ -43,12 +43,14 @@ module.exports.parseTemplate = function () {
   convertToNodeCallback(baseParseTemplate).apply(null, arguments);
 };
 
+
 // Node engine specific functions
-module.exports.parseTemplateGlob = function (scope, include, exclude, data, callback) {
-  var rootsArray = commons.io.getFiles(include, exclude);
+module.exports.parseTemplateGlob = function (include, options, callback) {
+  options = options || {};
+  var rootsArray = commons.io.getFiles(include, options.exclude);
   rootsArray.forEach(function (rootObject) {
     rootObject.files.forEach(function (relativePath) {
-      module.exports.parseTemplate(scope, path.join(rootObject.root, relativePath), data, function (error, data) {
+        module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
         callback(error, {
           relativePath: relativePath,
           result: data
@@ -58,11 +60,12 @@ module.exports.parseTemplateGlob = function (scope, include, exclude, data, call
   });
 };
 
-module.exports.parseTemplateGlobAndWrite = function (scope, include, exclude, data, output, clean) {
-  if (clean) {
+module.exports.parseTemplateGlobAndWrite = function (include, output, options) {
+  options = options || {};
+  if (options.clean) {
     fs.removeSync(output);
   }
-  module.exports.parseTemplateGlob(scope, include, exclude, data, function (error, data) {
+  module.exports.parseTemplateGlob(include, options, function (error, data) {
     if (error) {
       console.error(error);
     } else {
@@ -77,9 +80,9 @@ module.exports.parseTemplateGlobAndWrite = function (scope, include, exclude, da
 };
 
 
-module.exports.watch = function (scope, include, exclude, data, output, clean) {
-  module.exports.parseTemplateGlobAndWrite(scope, include, exclude, data, output, clean);
-  watch.watch(include, exclude, data, output);
+module.exports.watch = function (include, output, options) {
+  module.exports.parseTemplateGlobAndWrite(include, output, options);
+  watch.watch(include, output, options);
 };
 
 
@@ -119,13 +122,20 @@ if (!module.parent) {
   var output = cli.result.output || cwd;
   var clean = cli.result.clean || false;
 
+
+  var options = {};
+  options.exclude = exclude;
+  options.data = data;
+  options.clean = clean;
+
+
   if (cli.result.help) {
     cli.printHelp();
   } else {
     if (cli.result.watch) {
-      module.exports.watch(null, include, exclude, data, output, clean);
+      module.exports.watch(include, output, options);
     } else {
-      module.exports.parseTemplateGlobAndWrite(null, include, exclude, data, output, clean);
+      module.exports.parseTemplateGlobAndWrite(include, output, options);
     }
   }
 

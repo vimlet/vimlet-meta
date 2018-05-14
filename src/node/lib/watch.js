@@ -1,36 +1,38 @@
 var watch = require('glob-watcher');
 var path = require("path");
 var commons = require("@vimlet/commons");
-var meta = require("../index.js");
 var fs = require("fs-extra");
 
-exports.watch = function(include, exclude, data, output) {
+  exports.watch = function(include, output, options) {
+    var meta = require("../index.js");
+    options = options || {};
+    options.clean = false;
   console.log("Watching:",include);
   var watcher = watch(include,{
     events: ['add', 'change', 'unlink', 'addDir', 'unlinkDir']
   });
   watcher.on('change', function(filePath, stat) {
-    if (!isExcluded(exclude, filePath)) {
+    if (!isExcluded(options.exclude, filePath)) {
       // Relative output is where the template will be saved after parsed
       var relativeOutput = getRelativeOutput(include, output, filePath);
-      // Parse modified file
-      meta.parseTemplateGlobAndWrite(null, filePath, null, data, relativeOutput, false);
+      // Parse modified file      
+      meta.parseTemplateGlobAndWrite(filePath, relativeOutput, options);
       console.log("File modified:");
       console.log(filePath + " => " + path.join(relativeOutput,path.basename(filePath, ".vmt")));
     }
   });
   watcher.on('add', function(filePath, stat) {
-    if (!isExcluded(exclude, filePath)) {
+    if (!isExcluded(options.exclude, filePath)) {
       // Relative output is where the template will be saved after parsed
       var relativeOutput = getRelativeOutput(include, output, filePath);
       // Parse modified file
-      meta.parseTemplateGlobAndWrite(null, filePath, null, data, relativeOutput, false);
+      meta.parseTemplateGlobAndWrite(filePath, relativeOutput, options);
       console.log("File added:");
       console.log(filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
     }
   });
   watcher.on('unlink', function(filePath, stat) {
-    if (!isExcluded(exclude, filePath)) {
+    if (!isExcluded(options.exclude, filePath)) {
       // Relative output is where the template will be saved after parsed
       var relativeOutput = getRelativeOutput(include, output, filePath, true);
       var parsedPath = path.join(relativeOutput, path.basename(filePath, ".vmt"));
