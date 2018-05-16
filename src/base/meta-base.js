@@ -326,7 +326,7 @@ vimlet.meta = vimlet.meta || {};
     var standarPath = f.replace(/\\/g, "/");
     var path = standarPath.split("/");
 
-    var base = "";
+    var base = "./";
 
     if (standarPath.indexOf("/") > -1) {
       // Remove last part of the path
@@ -337,7 +337,6 @@ vimlet.meta = vimlet.meta || {};
       // Remove first /
       base = base.substring(1, base.length);
     }
-
     return base;
   };
 

@@ -13,11 +13,12 @@
     "doc:api": "alpha doc api -i **/*.js,**/*.html -o ../docs/api",
     "doc:article": "alpha doc article -i ../docs/md/**/*.md -o ../docs/article",
     "doc": "run-s doc:api doc:article",
+    "readme": "alpha readme",
     "badges": "alpha badges -o badges"
   },
   "author": "",
   "license": "UNLICENSED",
-  "devDependencies": {
-    "@vimlet/alpha": "0.1.19"
+  "optionalDependencies": {
+    "@vimlet/alpha": "0.1.29"
   }
 }

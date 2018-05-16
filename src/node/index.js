@@ -46,8 +46,8 @@ module.exports.parseTemplate = function () {
 
 // Node engine specific functions
 module.exports.parseTemplateGlob = function (include, options, callback) {
-  options = options || {};
-  var rootsArray = commons.io.getFiles(include, options.exclude);
+  options = options || {};  
+  var rootsArray = commons.io.getFiles(include, options.exclude);  
   rootsArray.forEach(function (rootObject) {
     rootObject.files.forEach(function (relativePath) {
         module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
@@ -60,11 +60,11 @@ module.exports.parseTemplateGlob = function (include, options, callback) {
   });
 };
 
-module.exports.parseTemplateGlobAndWrite = function (include, output, options) {
+module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {
   options = options || {};
   if (options.clean) {
     fs.removeSync(output);
-  }
+  }  
   module.exports.parseTemplateGlob(include, options, function (error, data) {
     if (error) {
       console.error(error);
@@ -73,10 +73,13 @@ module.exports.parseTemplateGlobAndWrite = function (include, output, options) {
         // Write data to output without .vmt extension
         var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
         fs.mkdirsSync(path.dirname(fileOutput));
-        fs.writeFileSync(fileOutput, data.result);
+        fs.writeFileSync(fileOutput, data.result);        
       }
     }
   });
+  if(callback){
+    callback();
+  }
 };
 
 
