@@ -122,7 +122,7 @@ vimlet.meta = vimlet.meta || {};
 
       if (callback) {
         // Must be asynchronous
-        require_fs.readFile(path, "utf8", function (error, buf) {
+        require_fs.readFile("./"+ path, "utf8", function (error, buf) {
           if (error) {
             console.log(error);
           } else {
@@ -131,7 +131,7 @@ vimlet.meta = vimlet.meta || {};
         });
       } else {
         // Must be synchronous
-        return require_fs.readFileSync(path, "utf8").toString();
+        return require_fs.readFileSync("./" + path, "utf8").toString();
       }
     } else {
       // TODO replace XMLHttpRequest by window.fetch with synchronous support
@@ -326,7 +326,7 @@ vimlet.meta = vimlet.meta || {};
     var standarPath = f.replace(/\\/g, "/");
     var path = standarPath.split("/");
 
-    var base = vimlet.meta.engine == "node" ? "./" : "";
+    var base = "";
 
     if (standarPath.indexOf("/") > -1) {
       // Remove last part of the path

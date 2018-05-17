@@ -16,17 +16,21 @@
         var text = "";
         text += "<% var world = 'World'; %>";
         text += "<%= world %>";
-        
+
         var data = null;
 
-        vimlet.meta.parse(null, text, data, function (result) {
+        vimlet.meta.parse(text, {
+            data: data
+        }, function (result) {
             document.querySelector("#world").innerHTML = result;
         });
 
         text = "";
         text += "<% template('import/template1'); %>"
-        
-        vimlet.meta.parse(null, text, data, function (result) {
+
+        vimlet.meta.parse(text, {
+            data: data
+        }, function (result) {
             document.querySelector("#template").innerHTML = result;
         });
 
