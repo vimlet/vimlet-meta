@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+//@header Parse templates into files.
 var commons = require("@vimlet/commons");
 var path = require("path");
 var glob = require("glob");
@@ -8,9 +8,11 @@ var cli = require("@vimlet/cli").instantiate();
 var watch = require("./lib/watch");
 
 // Make base accessible from the required scope
+//@property meta [Access to meta]
 module.exports = require("./lib/meta-base").instance();
 
 // Switch to node engine mode
+//@property engine [Engine to run (node|browser)]
 module.exports.engine = "node";
 
 // Function overloading and node standard(error, data) callbacks 
@@ -20,6 +22,7 @@ var baseParseTemplate = module.exports.parseTemplate;
 // Converts any callback to a standard(error, data) callback
 // NOTE: Only single param callback is supported
 // NOTE: Callback must be the last param
+//@function (private) converToNodeCallback [Converts any callback to a standard(error, data) callback, only single param callback is supported.] @param fn
 function convertToNodeCallback(fn) {
   return function () {
     var lastArgPosition = arguments.length - 1;
@@ -34,7 +37,7 @@ function convertToNodeCallback(fn) {
     }
   };
 }
-
+//@funcion parse (public) [Parse a template and return the result] @param template @param data @param callback
 module.exports.parse = function () {
   convertToNodeCallback(baseParse).apply(null, arguments);
 };
@@ -45,6 +48,7 @@ module.exports.parseTemplate = function () {
 
 
 // Node engine specific functions
+//@funcion parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
 module.exports.parseTemplateGlob = function (include, options, callback) {
   options = options || {};  
   var rootsArray = commons.io.getFiles(include, options.exclude);  
@@ -60,6 +64,7 @@ module.exports.parseTemplateGlob = function (include, options, callback) {
   });
 };
 
+//@funcion parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
 module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {
   options = options || {};
   if (options.clean) {
@@ -83,6 +88,7 @@ module.exports.parseTemplateGlobAndWrite = function (include, output, options, c
 };
 
 
+//@funcion watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
 module.exports.watch = function (include, output, options) {
   module.exports.parseTemplateGlobAndWrite(include, output, options);
   watch.watch(include, output, options);

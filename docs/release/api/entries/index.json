@@ -1,0 +1,21 @@
+{
+    "header": ["Parse templates into files."],
+    "path": "index.js",
+    "properties": [{
+        "description": "Engine to run (node|browser)",
+        "name": "engine"
+    }, {
+        "description": "Access to meta",
+        "name": "meta"
+    }],
+    "methods": [{
+        "description": "Converts any callback to a standard(error, data) callback, only single param callback is supported.",
+        "name": "converToNodeCallback",
+        "params": [{
+            "name": "fn"
+        }],
+        "return": null,
+        "exceptions": [],
+        "scope": "private"
+    }]
+}

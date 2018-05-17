@@ -1,10 +1,12 @@
 [//]: # (badges)
 
-![license](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526497658517/license.svg?raw=true "License")
-![build](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526497658517/build.svg?raw=true "Build")
-![docs](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526497658517/docs.svg?raw=true "Docs")
+![license](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526501235274/license.svg?raw=true "License")
+![build](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526501235274/build.svg?raw=true "Build")
+![docs](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526501235274/docs.svg?raw=true "Docs")
 
 [//]: # (badges)
+
+
 
 
 
@@ -47,7 +49,6 @@ npm install @vimlet/meta -g
 
     `{
         "exclude": "glob patterns",
-        "output": "string",
         "data": {},
         "clean": false
     }`
@@ -99,7 +100,7 @@ npm install @vimlet/meta -g
 
 ## Documentation
 
-WIP
+Read more [here](https://github.com/vimlet/VimletMeta/tree/master/docs/docs).
 
 ## License
 vComet is released under MIT License. See [LICENSE](https://github.com/vimlet/VimletMeta/blob/master/LICENSE) for details.
