@@ -326,7 +326,7 @@ vimlet.meta = vimlet.meta || {};
     var standarPath = f.replace(/\\/g, "/");
     var path = standarPath.split("/");
 
-    var base = "./";
+    var base = vimlet.meta.engine == "node" ? "./" : "";
 
     if (standarPath.indexOf("/") > -1) {
       // Remove last part of the path
