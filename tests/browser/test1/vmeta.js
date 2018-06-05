@@ -9,15 +9,11 @@ var vimlet = vimlet || {};
 
 vimlet.meta = vimlet.meta || {};
 
-// Hooks for sanbox functions
+// Hooks for sandbox functions
 // vimlet.meta.sandbox
 
 (function () {
-  // Node require
-  var require_fs;
-  var require_vm;
-
-  // Engine [browser, node]
+  // Engine [browser, node, ...]
   vimlet.meta.engine = vimlet.meta.engine || "browser";
 
   // Tags Array [tagOpen, tagClose, tagEcho]
@@ -113,94 +109,61 @@ vimlet.meta = vimlet.meta || {};
     return s;
   };
 
-  vimlet.meta.__getFile = function (path, callback) {
-    if (vimlet.meta.engine == "node") {
-      // node command
-      if (!require_fs) {
-        require_fs = require("fs");
-      }
 
-      if (callback) {
-        // Must be asynchronous
-        require_fs.readFile(path, "utf8", function (error, buf) {
-          if (error) {
-            console.log(error);
-          } else {
-            callback(buf.toString());
-          }
-        });
-      } else {
-        // Must be synchronous
-        return require_fs.readFileSync(path, "utf8").toString();
-      }
-    } else {
-      // TODO replace XMLHttpRequest by window.fetch with synchronous support
-      // Browser
-      var xhttp = new XMLHttpRequest();
+  vimlet.meta.__fileProvider = vimlet.meta.__fileProvider || function (path, callback) {
+    // TODO replace XMLHttpRequest by window.fetch with synchronous support
+    // Browser
+    var xhttp = new XMLHttpRequest();
 
-      xhttp.onreadystatechange = function () {
-        if (this.readyState === 4) {
-          if (this.status === 200) {
-            if (callback) {
-              // Must be asynchronous
-              callback(xhttp.responseText);
-            }
-          } else {
-            console.log("File error: " + this.status);
+    xhttp.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          if (callback) {
+            // Must be asynchronous
+            callback(xhttp.responseText);
           }
+        } else {
+          console.log("File error: " + this.status);
         }
-      };
-
-      if (callback) {
-        // Must be asynchronous
-        xhttp.open("GET", path, true);
-        xhttp.send();
-      } else {
-        // Must be synchronous
-        xhttp.open("GET", path, false);
-        xhttp.send();
-        return xhttp.responseText;
       }
+    };
+
+    if (callback) {
+      // Must be asynchronous
+      xhttp.open("GET", path, true);
+      xhttp.send();
+    } else {
+      // Must be synchronous
+      xhttp.open("GET", path, false);
+      xhttp.send();
+      return xhttp.responseText;
     }
+  };
+
+  vimlet.meta.__getFile = function (path, callback) {
+    if(callback) {
+      vimlet.meta.__fileProvider(path, callback);
+    } else {
+      return vimlet.meta.__fileProvider(path);    
+    }
+  };
+
+  vimlet.meta.__sandboxProvider = vimlet.meta.__sandboxProvider || function (sandbox) {
+    // Browser sandbox
+    iframe = document.createElement("iframe");
+    iframe.style.display = "none";
+    iframe.setAttribute(
+      "sandbox",
+      "allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
+    );
+    document.body.appendChild(iframe);
+    return iframe.contentWindow;
   };
 
   vimlet.meta.__createSandbox = function (scope) {
     var sandbox = eval.call(null, "this");
 
-    if (vimlet.meta.engine == "node") {
-      if (!require_vm) {
-        require_vm = require("vm");
-      }
-
-      // Clone node global scope to baseContext
-      var baseContext = Object.assign({}, sandbox);
-
-      // Add other node global modules to baseContext
-
-      // exports
-      // require
-      // module
-      // __filename
-      // __dirname
-
-      baseContext.exports = exports;
-      baseContext.require = require;
-      baseContext.module = module;
-      baseContext.__filename = __filename;
-      baseContext.__dirname = __dirname;
-
-      sandbox = new require_vm.createContext(baseContext);
-    } else {
-      // Browser sandbox
-      iframe = document.createElement("iframe");
-      iframe.style.display = "none";
-      iframe.setAttribute(
-        "sandbox",
-        "allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
-      );
-      document.body.appendChild(iframe);
-      sandbox = iframe.contentWindow;
-    }
+    sandbox = vimlet.meta.__sandboxProvider(sandbox);
 
     // Inject scope
     if (scope) {
@@ -220,6 +183,10 @@ vimlet.meta = vimlet.meta || {};
     }
 
     sandbox = null;
+  };
+
+  vimlet.meta.__evalProvider = function (s, sandbox) {
+    sandbox.eval.call(null, s);
   };
 
   vimlet.meta.__injectSandboxFunctions = function (sandbox) {
@@ -247,12 +214,7 @@ vimlet.meta = vimlet.meta || {};
       sandbox.__output = "";
       sandbox.__basePath = basepath;
 
-      if (vimlet.meta.engine == "node") {
-        var script = new require_vm.Script(s);
-        script.runInContext(sandbox);
-      } else {
-        sandbox.eval.call(null, s);
-      }
+      vimlet.meta.__evalProvider(s, sandbox);
 
       return sandbox.__output;
     };
@@ -326,7 +288,7 @@ vimlet.meta = vimlet.meta || {};
     var standarPath = f.replace(/\\/g, "/");
     var path = standarPath.split("/");
 
-    var base = vimlet.meta.engine == "node" ? "./" : "";
+    var base = "";
 
     if (standarPath.indexOf("/") > -1) {
       // Remove last part of the path
