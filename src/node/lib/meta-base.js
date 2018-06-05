@@ -116,53 +116,32 @@ vimlet.meta = vimlet.meta || {};
   };
 
   vimlet.meta.__getFile = function (path, callback) {
-    if (vimlet.meta.engine == "node") {
-      // node command
-      if (!require_fs) {
-        require_fs = require("fs");
-      }
+    // TODO replace XMLHttpRequest by window.fetch with synchronous support
+    // Browser
+    var xhttp = new XMLHttpRequest();
 
-      if (callback) {
-        // Must be asynchronous
-        require_fs.readFile("./"+ path, "utf8", function (error, buf) {
-          if (error) {
-            console.log(error);
-          } else {
-            callback(buf.toString());
+    xhttp.onreadystatechange = function () {
+      if (this.readyState === 4) {
+        if (this.status === 200) {
+          if (callback) {
+            // Must be asynchronous
+            callback(xhttp.responseText);
           }
-        });
-      } else {
-        // Must be synchronous
-        return require_fs.readFileSync("./" + path, "utf8").toString();
-      }
-    } else {
-      // TODO replace XMLHttpRequest by window.fetch with synchronous support
-      // Browser
-      var xhttp = new XMLHttpRequest();
-
-      xhttp.onreadystatechange = function () {
-        if (this.readyState === 4) {
-          if (this.status === 200) {
-            if (callback) {
-              // Must be asynchronous
-              callback(xhttp.responseText);
-            }
-          } else {
-            console.log("File error: " + this.status);
-          }
+        } else {
+          console.log("File error: " + this.status);
         }
-      };
-
-      if (callback) {
-        // Must be asynchronous
-        xhttp.open("GET", path, true);
-        xhttp.send();
-      } else {
-        // Must be synchronous
-        xhttp.open("GET", path, false);
-        xhttp.send();
-        return xhttp.responseText;
       }
+    };
+
+    if (callback) {
+      // Must be asynchronous
+      xhttp.open("GET", path, true);
+      xhttp.send();
+    } else {
+      // Must be synchronous
+      xhttp.open("GET", path, false);
+      xhttp.send();
+      return xhttp.responseText;
     }
   };
 

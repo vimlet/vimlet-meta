@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-//@header Parse templates into files.
+ //@header Parse templates into files.
 var commons = require("@vimlet/commons");
 var path = require("path");
 var glob = require("glob");
@@ -14,6 +14,27 @@ module.exports = require("./lib/meta-base").instance();
 // Switch to node engine mode
 //@property engine [Engine to run (node|browser)]
 module.exports.engine = "node";
+
+//Override getFile for node
+module.exports.__getFile = function (filePath, callback) {
+  var fixedPath = filePath;
+  if (!path.isAbsolute(filePath)) {
+    fixedPath = "./" + filePath;
+  }
+  if (callback) {
+    // Must be asynchronous
+    fs.readFile(fixedPath, "utf8", function (error, buf) {
+      if (error) {
+        console.log(error);
+      } else {
+        callback(buf.toString());
+      }
+    });
+  } else {
+    // Must be synchronous
+    return fs.readFileSync(fixedPath, "utf8").toString();
+  }
+};
 
 // Function overloading and node standard(error, data) callbacks 
 var baseParse = module.exports.parse;
@@ -50,11 +71,11 @@ module.exports.parseTemplate = function () {
 // Node engine specific functions
 //@funcion parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
 module.exports.parseTemplateGlob = function (include, options, callback) {
-  options = options || {};  
-  var rootsArray = commons.io.getFiles(include, options.exclude);  
+  options = options || {};
+  var rootsArray = commons.io.getFiles(include, options.exclude);
   rootsArray.forEach(function (rootObject) {
     rootObject.files.forEach(function (relativePath) {
-        module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
+      module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
         callback(error, {
           relativePath: relativePath,
           result: data
@@ -69,7 +90,7 @@ module.exports.parseTemplateGlobAndWrite = function (include, output, options, c
   options = options || {};
   if (options.clean) {
     fs.removeSync(output);
-  }  
+  }
   module.exports.parseTemplateGlob(include, options, function (error, data) {
     if (error) {
       console.error(error);
@@ -78,20 +99,25 @@ module.exports.parseTemplateGlobAndWrite = function (include, output, options, c
         // Write data to output without .vmt extension
         var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
         fs.mkdirsSync(path.dirname(fileOutput));
-        fs.writeFileSync(fileOutput, data.result);        
+        fs.writeFileSync(fileOutput, data.result);
       }
     }
   });
-  if(callback){
+  if (callback) {
     callback();
   }
 };
 
 
-//@funcion watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
+//@funcion watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder, watchdirectory:watch directories for changes and compile watch files] @param callback
 module.exports.watch = function (include, output, options) {
   module.exports.parseTemplateGlobAndWrite(include, output, options);
   watch.watch(include, output, options);
+  if (options && options.watchdirectory) { 
+    watch.watchDirectory(options.watchdirectory, function () {
+      module.exports.parseTemplateGlobAndWrite(include, output, options);
+    });
+  }
 };
 
 
@@ -113,6 +139,7 @@ if (!module.parent) {
     .value("-d", "--data", "Json file path")
     .flag("-c", "--clean", "Clean output directory")
     .flag("-w", "--watch", "Keeps watching for changes")
+    .value("-wd", "--watchdirectory", "Watch directory for changes")
     .flag("-h", "--help", "Shows help")
     .parse(process.argv);
 
@@ -136,7 +163,9 @@ if (!module.parent) {
   options.exclude = exclude;
   options.data = data;
   options.clean = clean;
-
+  if (cli.result.watchdirectory) {
+    options.watchdirectory = cli.result.watchdirectory;
+  }
 
   if (cli.result.help) {
     cli.printHelp();
