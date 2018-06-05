@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@vimlet/commons": "2.5.12",
-    "@vimlet/cli": "1.0.0",
+    "@vimlet/cli": "1.2.4",
     "fs-extra": "4.0.1",
     "js-yaml": "3.8.4",
     "mkdirp": "0.5.1",

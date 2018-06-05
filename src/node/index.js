@@ -138,8 +138,7 @@ if (!module.parent) {
     .value("-o", "--output", "Output path")
     .value("-d", "--data", "Json file path")
     .flag("-c", "--clean", "Clean output directory")
-    .flag("-w", "--watch", "Keeps watching for changes")
-    .value("-wd", "--watchdirectory", "Watch directory for changes")
+    .value("-w", "--watch", "Keeps watching for changes")
     .flag("-h", "--help", "Shows help")
     .parse(process.argv);
 
@@ -163,14 +162,14 @@ if (!module.parent) {
   options.exclude = exclude;
   options.data = data;
   options.clean = clean;
-  if (cli.result.watchdirectory) {
-    options.watchdirectory = cli.result.watchdirectory;
-  }
 
   if (cli.result.help) {
     cli.printHelp();
   } else {
     if (cli.result.watch) {
+      if (typeof(cli.result.watch) != "boolean") {
+        options.watchdirectory = cli.result.watch;
+      }
       module.exports.watch(include, output, options);
     } else {
       module.exports.parseTemplateGlobAndWrite(include, output, options);

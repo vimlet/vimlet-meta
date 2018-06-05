@@ -19,7 +19,15 @@ var commons = require("@vimlet/commons");
 // });
 
 
-commons.run.exec("node", [metaBin, "-i", "**/*.vmt", "-d", "resources/data.json"], null, null, function (error, data) {
+// commons.run.exec("node", [metaBin, "-i", "**/*.vmt", "-d", "resources/data.json"], null, null, function (error, data) {
+//   if (error) {
+//     console.error(error);
+//   } else {
+//     console.log("done!");
+//   }
+// });
+
+commons.run.exec("node", [metaBin, "-i", "**/*.vmt", "-d", "resources/data.json", "-o", "output", "-w", "resources"], null, null, function (error, data) {
   if (error) {
     console.error(error);
   } else {
