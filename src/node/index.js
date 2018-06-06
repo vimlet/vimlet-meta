@@ -153,6 +153,7 @@ module.exports.watch = function (include, output, options) {
   if (options && options.watchdirectory) {
     watch.watchDirectory(options.watchdirectory, function () {
       module.exports.parseTemplateGlobAndWrite(include, output, options);
+      console.log("Templates have been parsed.");      
     });
   }
 };

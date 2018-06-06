@@ -59,7 +59,7 @@ exports.watch = function (include, output, options) {
   });
   watcher.on('error', function (error) {
     if (process.platform === 'win32' && error.code === 'EPERM') {
-      console.log("Deleting an empty folder doesn't fire on windows");
+      // Deleting an empty folder doesn't fire on windows
     } else {
       broadcastErr(error);
     }
@@ -72,16 +72,27 @@ exports.watchDirectory = function (include, callback) {
     events: ['add', 'change', 'unlink', 'unlinkDir']
   });
   watcher.on('change', function (filePath, stat) {
+    console.log("File ", filePath, " modify at watch directory.");
     callback();
   });
   watcher.on('add', function (filePath, stat) {
+    console.log("File ", filePath, " added at watch directory.");
     callback();
   });
   watcher.on('unlink', function (filePath, stat) {
+    console.log("File ", filePath, " deleted at watch directory.");
     callback();
   });
   watcher.on('unlinkDir', function (filePath, stat) {
+    console.log("Folder ", filePath, " removed at watch directory.");
     callback();
+  });
+  watcher.on('error', function (error) {
+    if (process.platform === 'win32' && error.code === 'EPERM') {
+      // Deleting an empty folder doesn't fire on windows
+    } else {
+      broadcastErr(error);
+    }
   });
 };
 
