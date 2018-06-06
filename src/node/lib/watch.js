@@ -17,8 +17,7 @@ exports.watch = function (include, output, options) {
       var relativeOutput = getRelativeOutput(include, output, filePath);
       // Parse modified file      
       meta.parseTemplateGlobAndWrite(filePath, relativeOutput, options);
-      console.log("File modified:");
-      console.log(filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
+      console.log("Changed --> ", filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
     }
   });
   watcher.on('add', function (filePath, stat) {
@@ -27,8 +26,7 @@ exports.watch = function (include, output, options) {
       var relativeOutput = getRelativeOutput(include, output, filePath);
       // Parse modified file
       meta.parseTemplateGlobAndWrite(filePath, relativeOutput, options);
-      console.log("File added:");
-      console.log(filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
+      console.log("Added --> ", filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
     }
   });
   watcher.on('unlink', function (filePath, stat) {
@@ -38,23 +36,20 @@ exports.watch = function (include, output, options) {
       var parsedPath = path.join(relativeOutput, path.basename(filePath, ".vmt"));
       if (fs.existsSync(parsedPath)) {
         fs.unlinkSync(parsedPath);
-        console.log("File deleted:");
-        console.log(parsedPath);
+        console.log("Removed --> ", parsedPath);
       }
     }
   });
   watcher.on('addDir', function (filePath, stat) {
     var relativeOutput = getRelativeOutput(include, output, filePath);
     fs.mkdirs(path.join(relativeOutput, path.basename(filePath)), function () {
-      console.log("Folder created:");
-      console.log(filePath, "=>", path.join(relativeOutput, path.basename(filePath)));
+      console.log("Folder created --> ", filePath, "=>", path.join(relativeOutput, path.basename(filePath)));
     });
   });
   watcher.on('unlinkDir', function (filePath, stat) {
     var relativeOutput = getRelativeOutput(include, output, filePath, true);
     fs.remove(path.join(relativeOutput, path.basename(filePath)), function () {
-      console.log("Folder removed:");
-      console.log(path.join(relativeOutput, path.basename(filePath)));
+      console.log("Folder removed --> ", path.join(relativeOutput, path.basename(filePath)));
     });
   });
   watcher.on('error', function (error) {
@@ -66,26 +61,34 @@ exports.watch = function (include, output, options) {
   });
 };
 
-exports.watchDirectory = function (include, callback) {
+exports.watchDirectory = function (include, exclude, callback) {
   var meta = require("../index.js");
   var watcher = watch(include, {
     events: ['add', 'change', 'unlink', 'unlinkDir']
   });
   watcher.on('change', function (filePath, stat) {
-    console.log("File ", filePath, " modify at watch directory.");
-    callback();
+    if (!isExcluded(exclude, filePath)) {
+      console.log("Changed --> ", filePath);
+      callback();
+    }
   });
   watcher.on('add', function (filePath, stat) {
-    console.log("File ", filePath, " added at watch directory.");
-    callback();
+    if (!isExcluded(exclude, filePath)) {
+      console.log("Added --> ", filePath);
+      callback();
+    }
   });
   watcher.on('unlink', function (filePath, stat) {
-    console.log("File ", filePath, " deleted at watch directory.");
-    callback();
+    if (!isExcluded(exclude, filePath)) {
+      console.log("Removed --> ", filePath);
+      callback();
+    }
   });
   watcher.on('unlinkDir', function (filePath, stat) {
-    console.log("Folder ", filePath, " removed at watch directory.");
-    callback();
+    if (!isExcluded(exclude, filePath)) {
+      console.log("Directory removed --> ", filePath);
+      callback();
+    }
   });
   watcher.on('error', function (error) {
     if (process.platform === 'win32' && error.code === 'EPERM') {
