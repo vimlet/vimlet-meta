@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 //@header Parse templates into files.
-var commons = require("@vimlet/commons");
+var io = require("@vimlet/io");
 var path = require("path");
 var glob = require("glob");
 var fs = require("fs-extra");
@@ -109,7 +109,7 @@ module.exports.parseTemplate = function () {
 // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
 module.exports.parseTemplateGlob = function (include, options, callback) {
   options = options || {};
-  var rootsArray = commons.io.getFiles(include, options.exclude);
+  var rootsArray = io.getFiles(include, options.exclude);
   rootsArray.forEach(function (rootObject) {
     rootObject.files.forEach(function (relativePath) {
       module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {

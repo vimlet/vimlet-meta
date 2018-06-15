@@ -1,6 +1,6 @@
 var watch = require('glob-watcher');
 var path = require("path");
-var commons = require("@vimlet/commons");
+var io = require("@vimlet/io");
 var fs = require("fs-extra");
 
 exports.watch = function (include, output, options) {
@@ -110,16 +110,16 @@ exports.watchDirectory = function (include, exclude, callback) {
 function getRelativeOutput(include, output, filePath, deleted) {
   var relativeOutput;
   if (!Array.isArray(include)) {
-    if (commons.io.isInPattern(filePath, include) || deleted) {
-      var rootFromPattern = commons.io.getRootFromPattern(include);
+    if (io.isInPattern(filePath, include) || deleted) {
+      var rootFromPattern = io.getRootFromPattern(include);
       // Relative output is where the template will be saved after parse
       relativeOutput = path.dirname(path.relative(rootFromPattern, filePath));
       relativeOutput = path.join(output, relativeOutput);
     }
   } else {
     include.forEach(function (incl) {
-      if (commons.io.isInPattern(filePath, incl) || deleted) {
-        var rootFromPattern = commons.io.getRootFromPattern(incl);
+      if (io.isInPattern(filePath, incl) || deleted) {
+        var rootFromPattern = io.getRootFromPattern(incl);
         // Relative output is where the template will be saved after parse
         relativeOutput = path.dirname(path.relative(rootFromPattern, filePath));
         relativeOutput = path.join(output, relativeOutput);
@@ -140,11 +140,11 @@ function isExcluded(excluded, filePath) {
     return false;
   }
   if (!Array.isArray(excluded)) {
-    return commons.io.isInPattern(filePath, excluded);
+    return io.isInPattern(filePath, excluded);
   } else {
     var isIn = false;
     excluded.forEach(function (excl) {
-      if (commons.io.isInPattern(filePath, excl)) {
+      if (io.isInPattern(filePath, excl)) {
         isIn = true;
       }
     });
