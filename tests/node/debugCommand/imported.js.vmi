@@ -1,0 +1,11 @@
+<% echo("var testVar='" + testVar + "';");%>
+
+function sayHi(){
+    console.log(testVar);
+    
+    if(testVar === "I am a test var"){
+        console.log("Hi", "OK"); 
+    }else{
+        console.log("Hi", "WRONG");        
+    }
+}

@@ -124,6 +124,10 @@ module.exports.parseTemplateGlob = function (include, options, callback) {
 
 // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
 module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {
+  console.log(include);
+  console.log(output);
+  console.log(options);
+  
   options = options || {};
   if (options.clean) {
     fs.removeSync(output);
@@ -188,7 +192,7 @@ if (!module.parent) {
     }
   }
 
-  var include = cli.result.include || "**/*.vmt";
+  var include = cli.result.include || path.join(cwd, "**/*.vmt");
   var exclude = cli.result.exclude || "**node_modules**";
   var data = readData || {};
   var output = cli.result.output || cwd;
@@ -208,7 +212,7 @@ if (!module.parent) {
         options.watchdirectory = cli.result.watch;
       }
       module.exports.watch(include, output, options);
-    } else {
+    } else {      
       module.exports.parseTemplateGlobAndWrite(include, output, options);
     }
   }
