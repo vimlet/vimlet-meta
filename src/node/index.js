@@ -61,9 +61,7 @@ module.exports.__fileProvider = function (filePath, callback) {
   if (callback) {
     // Must be asynchronous
     fs.readFile(fixedPath, "utf8", function (error, buf) {
-      if (error) {
-        console.log(error);
-      } else {
+      if (!error) {
         callback(buf.toString());
       }
     });
@@ -123,11 +121,7 @@ module.exports.parseTemplateGlob = function (include, options, callback) {
 };
 
 // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
-module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {
-  console.log(include);
-  console.log(output);
-  console.log(options);
-  
+module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {  
   options = options || {};
   if (options.clean) {
     fs.removeSync(output);
