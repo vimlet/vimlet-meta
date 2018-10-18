@@ -11,7 +11,7 @@ It is a tool that generate files from templates.
 
 ## Installation
 
-npm install @vimlet/meta -g
+npm install @vimlet/meta
 
 ## Usage
 
