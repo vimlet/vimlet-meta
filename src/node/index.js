@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-//@header Parse templates into files.
+ //@header Parse templates into files.
 var io = require("@vimlet/io");
 var path = require("path");
 var glob = require("glob");
@@ -7,10 +7,10 @@ var fs = require("fs-extra");
 var cli = require("@vimlet/cli").instantiate();
 var watch = require("./lib/watch");
 
- // Node require
- var require_fs;
- var require_vm;
- 
+// Node require
+var require_fs;
+var require_vm;
+
 // Make base accessible from the required scope
 // @property meta [Access to meta]
 module.exports = require("./lib/meta-base").instance();
@@ -47,7 +47,7 @@ module.exports.__sandboxProvider = function (sandbox) {
 };
 
 // Override evalProvider for node
-module.exports.__evalProvider = function(s, sandbox) {
+module.exports.__evalProvider = function (s, sandbox) {
   var script = new require_vm.Script(s);
   script.runInContext(sandbox);
 };
@@ -66,8 +66,19 @@ module.exports.__fileProvider = function (filePath, callback) {
       }
     });
   } else {
-    // Must be synchronous
-    return fs.readFileSync(fixedPath, "utf8").toString();
+    // Must be synchronous    
+    try {
+      return fs.readFileSync(fixedPath, "utf8").toString();
+    } catch (error) {   
+      if(error.path){
+        console.log();        
+        console.log("Error, file not found: ", error.path);
+        console.log();        
+      }else{
+        console.log(error);
+        
+      }
+    }
   }
 };
 
@@ -107,7 +118,7 @@ module.exports.parseTemplate = function () {
 // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
 module.exports.parseTemplateGlob = function (include, options, callback) {
   options = options || {};
-  var rootsArray = io.getFiles(include, options.exclude);
+  var rootsArray = io.getFiles(include, options);
   rootsArray.forEach(function (rootObject) {
     rootObject.files.forEach(function (relativePath) {
       module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
@@ -121,7 +132,7 @@ module.exports.parseTemplateGlob = function (include, options, callback) {
 };
 
 // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
-module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {  
+module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {
   options = options || {};
   if (options.clean) {
     fs.removeSync(output);
@@ -206,7 +217,7 @@ if (!module.parent) {
         options.watchdirectory = cli.result.watch;
       }
       module.exports.watch(include, output, options);
-    } else {      
+    } else {
       module.exports.parseTemplateGlobAndWrite(include, output, options);
     }
   }
