@@ -1,17 +1,4 @@
-[//]: # (badges)
-
-![license](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526501235274/license.svg?raw=true "License")
-![build](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526501235274/build.svg?raw=true "Build")
-![docs](https://vimlet.com/vimlet/VimletDoc/master/docs/readme/1526501235274/docs.svg?raw=true "Docs")
-
-[//]: # (badges)
-
-
-
-
-
-
-# **VimletMeta**
+# **Vimlet Meta**
 
 It is a tool that generate files from templates.
 
