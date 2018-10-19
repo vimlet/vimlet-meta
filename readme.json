@@ -4,7 +4,7 @@
     "license": {
       "value": "MIT",
       "color": "blue",
-      "link": "https://github.com/vimlet/VimletMeta/blob/master/LICENSE"
+      "link": "https://github.com/vimlet/vimlet-meta/blob/master/LICENSE"
     },
     "build": {
       "value": "passing",
@@ -13,7 +13,7 @@
     "docs": {
       "value": "documentation",
       "color": "blue",
-      "link": "https://github.com/vimlet/VimletMeta/tree/master/docs/docs"
+      "link": "https://github.com/vimlet/vimlet-meta/tree/master/docs/docs"
     }
   },
   "output": "docs/readme",

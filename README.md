@@ -1,4 +1,6 @@
-# **Vimlet Meta**
+<p align='center'>
+<img src='https://vimlet.com/resources/img/Meta-txt.png' title='Vimlet Cli' alt='Vimlet Meta'>
+</p>
 
 It is a tool that generate files from templates.
 
@@ -67,9 +69,9 @@ npm install @vimlet/meta
 >` Hello I'm a template <% data.name %>`
 >
 >* Data:
-> `{"name":"VimletMeta"}`
+> `{"name":"vimlet-meta"}`
 >* Result:
-> `Hello I'm a template VimletMeta`
+> `Hello I'm a template vimlet-meta`
 
 >* Template1:
 >` Hello I'm a template <%template(template2.vmi)%>`
@@ -87,7 +89,7 @@ npm install @vimlet/meta
 
 ## Documentation
 
-Read more [here](https://github.com/vimlet/VimletMeta/tree/master/docs/docs).
+Read more [here](https://github.com/vimlet/vimlet-meta/tree/master/docs/docs).
 
 ## License
-vComet is released under MIT License. See [LICENSE](https://github.com/vimlet/VimletMeta/blob/master/LICENSE) for details.
+vComet is released under MIT License. See [LICENSE](https://github.com/vimlet/vimlet-meta/blob/master/LICENSE) for details.
