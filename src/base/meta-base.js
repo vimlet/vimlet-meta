@@ -199,14 +199,14 @@ vimlet.meta = vimlet.meta || {};
     };
 
     sandbox.template = function (t) {
-      var __fullPath = sandbox.__basePath + "/" + t;
+      var __fullPath = (sandbox.__basePath != "" ? sandbox.__basePath + "/" : "") + t;
       var storedOutput = sandbox.__output;
       var parsedTemplate = sandbox.__parseTemplate(__fullPath);
       sandbox.__output = storedOutput + parsedTemplate;
     };
 
     sandbox.include = function (t) {
-      var __fullPath = sandbox.__basePath + "/" + t;
+      var __fullPath = (sandbox.__basePath != "" ? sandbox.__basePath + "/" : "") + t;
       var parsedTemplate = sandbox.__includeTemplate(__fullPath);
     };
 

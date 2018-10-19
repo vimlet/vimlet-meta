@@ -4,7 +4,11 @@ var chrome = "start chrome";
 var meta = require("../../../src/node");
 var path = require("path");
 
-meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*"), path.join(__dirname, "output"), {exclude:"resources/excluded/*"});
+// Works but throw errors because of imported files.
+// meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*"), path.join(__dirname, "output"), {exclude:"resources/excluded/*"});
+
+// Works without errors because it just parse .vmt files
+meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*.vmt"), path.join(__dirname, "output"), {exclude:"resources/excluded/*"});
 
 
 // Get open with chrome param
