@@ -83,13 +83,33 @@ npm install @vimlet/meta
 > `Hello I'm a template I'm another template`
 
 
+## Data binding
+
+One of the meta advantages is the ability to bind data from a json. IE:
+
+Template:
+
+`Hello <%= data.name%>`
+
+Data:
+
+`{"name": "Peter"}`
+
+Result:
+
+```
+Hello Peter
+```
+
+## File extension
+
+We use .vmt for vimlet meta templates and .vmi for vimlet meta imported in our imported templates but any extension is welcome.
+
+Note that meta respect file extension if it is included in template name:
+* index.html.vmt after parsed will be written as index.html.
 
 
 
-
-## Documentation
-
-Read more [here](https://github.com/vimlet/vimlet-meta/tree/master/docs/docs).
 
 ## License
 vComet is released under MIT License. See [LICENSE](https://github.com/vimlet/vimlet-meta/blob/master/LICENSE) for details.

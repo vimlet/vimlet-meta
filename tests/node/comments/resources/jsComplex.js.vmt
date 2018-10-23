@@ -1,0 +1,26 @@
+function example(){
+    return "function";
+}
+
+/* <% template("js2.js"); %> 
+
+
+
+*/
+
+
+
+
+function example2(){
+    return "function";
+}
+
+
+
+// <% template("js2.js"); %> 
+
+
+
+function example3(){
+    return "function";
+}

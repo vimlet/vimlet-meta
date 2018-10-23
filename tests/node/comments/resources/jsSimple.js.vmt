@@ -1,0 +1,5 @@
+function example(){
+    return "function";
+}
+
+// <% template("js2.js"); %>

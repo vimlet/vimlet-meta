@@ -19,6 +19,12 @@ vimlet.meta = vimlet.meta || {};
   // Tags Array [tagOpen, tagClose, tagEcho]
   vimlet.meta.tags = vimlet.meta.tags || ["<%", "%>", "="];
 
+  // Parse commented templates
+  vimlet.meta.parseCommented = vimlet.meta.parseCommented || true;
+  // Comment tags array
+  vimlet.meta.commentTags = vimlet.meta.commentTags || ["//", ["/*", "*/"], "#", ["<!--", "-->"]];
+
+
   //Line break replacement
   vimlet.meta.lineBreak = vimlet.meta.lineBreak || null;
 
@@ -96,6 +102,68 @@ vimlet.meta = vimlet.meta || {};
       "g"
     );
   };
+
+  // Remove comments from commented tags
+  vimlet.meta.__cleanCommented = function (t) {
+    vimlet.meta.commentTags.forEach(function (tag) {
+      var regex;
+      if (Array.isArray(tag)) {
+        tag[0] = tag[0] || "";
+        tag[1] = tag[1] || "";
+        regex = new RegExp(
+          vimlet.meta.__escapeRegExp(tag[0]) + "\\s*" +
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
+          "(?:(?!" +
+          vimlet.meta.__escapeRegExp(tag[0]) + "\\s*" +
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
+          ")[\\s\\S])*" +
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
+          "\\s*" + vimlet.meta.__escapeRegExp(tag[1]) +
+          "(\\r\\n|\\r|\\n){0,1}",
+          "g"
+        );
+        // Replace template with evalMatches
+        t = t.replace(regex, function (match) {
+          match = match.trim();
+          // Remove tags
+          match = match
+            .substring(
+              tag[0].length,
+              match.length - tag[1].length
+            )
+            .trim();
+          return match;
+        });
+      } else {
+        tag = tag || "";          
+        regex = new RegExp(
+          vimlet.meta.__escapeRegExp(tag) + "\\s*" +
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
+          "(?:(?!" +
+          vimlet.meta.__escapeRegExp(tag) + "\\s*" +
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
+          ")[\\s\\S])*" +
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
+          "\\s*" +
+          "(\\r\\n|\\r|\\n|$){1,1}",
+          "g"
+        );  
+        // Replace template with evalMatches
+        t = t.replace(regex, function (match) {
+          match = match.trim();
+          // Remove tags
+          match = match
+            .substring(
+              tag.length,
+              match.length
+            )
+            .trim();
+          return match;
+        });                  
+      }
+    });
+    return t;
+  }
 
   // Escape special characters from tags
   vimlet.meta.__escapeRegExp = function (str) {
@@ -221,6 +289,10 @@ vimlet.meta = vimlet.meta || {};
 
     sandbox.__parse = function (t, templatePath) {
       var result = "";
+
+      if (vimlet.meta.parseCommented) {
+        t = vimlet.meta.__cleanCommented(t);
+      }
 
       if (!templatePath) {
         templatePath = "";

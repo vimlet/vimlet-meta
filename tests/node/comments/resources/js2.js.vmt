@@ -1,0 +1,9 @@
+function example(){
+    return "function";
+}
+
+/* <% template("js2.js"); %> */
+
+function example1(){
+    return "function";
+}

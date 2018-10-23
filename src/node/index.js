@@ -184,6 +184,7 @@ if (!module.parent) {
     .value("-o", "--output", "Output path")
     .value("-d", "--data", "Json file path")
     .flag("-c", "--clean", "Clean output directory")
+    .flag("-p", "--preventCommented", "Prevent removal of wrapped templates")
     .value("-w", "--watch", "Keeps watching for changes")
     .flag("-h", "--help", "Shows help")
     .parse(process.argv);
@@ -195,6 +196,9 @@ if (!module.parent) {
     if (fs.existsSync(path.join(cwd, cli.result.data))) {
       readData = JSON.parse(fs.readFileSync(path.join(cwd, cli.result.data)));
     }
+  }
+  if (cli.result.preventCommented) {
+    module.exports.parseCommented = false;    
   }
 
   var include = cli.result.include || path.join(cwd, "**/*.vmt");
