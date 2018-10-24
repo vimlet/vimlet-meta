@@ -16,9 +16,16 @@ function example2(){
 
 function imported(){
     return "imported file";
-}
+} 
+
 
 
 function example3(){
     return "function";
 }
+
+
+
+function imported(){
+    return "imported file";
+}//Joint

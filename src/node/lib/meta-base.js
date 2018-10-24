@@ -137,19 +137,16 @@ vimlet.meta = vimlet.meta || {};
           return match;
         });
       } else {
-        tag = tag || "";          
+        tag = tag || "";           
         regex = new RegExp(
           vimlet.meta.__escapeRegExp(tag) + "\\s*" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
           "(?:(?!" +
-          vimlet.meta.__escapeRegExp(tag) + "\\s*" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
           ")[\\s\\S])*" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
-          "( |\t)*" +
-          "(\\r\\n|\\r|\\n|$){1,1}",
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose),
           "g"
-        );  
+        );   
         // Replace template with evalMatches
         t = t.replace(regex, function (match) {
           match = match.trim();

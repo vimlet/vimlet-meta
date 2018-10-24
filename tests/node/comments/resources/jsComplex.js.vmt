@@ -24,3 +24,7 @@ function example2(){
 function example3(){
     return "function";
 }
+
+
+
+// <% template("js2.js"); %>//Joint
