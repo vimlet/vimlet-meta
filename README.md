@@ -57,6 +57,23 @@ npm install @vimlet/meta
 
     Calls meta.watch
 
+### Extra
+
+**vimlet-meta** remove comments if there are only meta code within it.
+
+> <% teamplate("anothertemplate.vmi")%>
+> 
+> produce the same result as
+> 
+> // <% teamplate("anothertemplate.vmi")%>
+>
+> or
+>
+> /* <% teamplate("anothertemplate.vmi")%> */
+
+This behaviour can be avoided using `-p`.
+
+
 ## Example
 
 >* Template:
