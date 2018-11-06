@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "author": "",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bin": {
     "vimlet-meta": "./index.js"
   },

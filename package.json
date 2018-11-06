@@ -21,7 +21,7 @@
     "badges": "alpha badges -o badges"
   },
   "author": "",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "optionalDependencies": {
     "@vimlet/alpha": "0.1.29"
   },

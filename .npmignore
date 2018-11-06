@@ -7,3 +7,7 @@
 /src/browser
 /src/node/node_modules
 /src/node/.gitignore
+.gitignore
+LICENSE
+doc.json
+readme.json
