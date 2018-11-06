@@ -1,0 +1,9 @@
+/node_modules
+/npm-debug.log
+/package-lock.json
+/docs
+/tests
+/src/base
+/src/browser
+/src/node/node_modules
+/src/node/.gitignore
