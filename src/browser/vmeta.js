@@ -137,7 +137,7 @@ vimlet.meta = vimlet.meta || {};
       } else {
         tag = tag || "";           
         regex = new RegExp(
-          vimlet.meta.__escapeRegExp(tag) + "\\s*" +
+          vimlet.meta.__escapeRegExp(tag) + "( |\\t)*" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
           "(?:(?!" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +

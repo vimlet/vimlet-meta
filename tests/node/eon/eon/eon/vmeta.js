@@ -1,5 +1,3 @@
-exports.instance = function() {
-
 // MODE: INTERPRETER
 // - client (browser)
 // - server (node)
@@ -11,21 +9,19 @@ var vimlet = vimlet || {};
 
 vimlet.meta = vimlet.meta || {};
 
-// Hooks for sandbox functions
+// Hooks for sanbox functions
 // vimlet.meta.sandbox
 
 (function () {
-  // Engine [browser, node, ...]
+  // Node require
+  var require_fs;
+  var require_vm;
+
+  // Engine [browser, node]
   vimlet.meta.engine = vimlet.meta.engine || "browser";
 
   // Tags Array [tagOpen, tagClose, tagEcho]
   vimlet.meta.tags = vimlet.meta.tags || ["<%", "%>", "="];
-
-  // Parse commented templates
-  vimlet.meta.parseCommented = vimlet.meta.parseCommented || true;
-  // Comment tags array
-  vimlet.meta.commentTags = vimlet.meta.commentTags || ["//", ["/*", "*/"], "#", ["<!--", "-->"]];
-
 
   //Line break replacement
   vimlet.meta.lineBreak = vimlet.meta.lineBreak || null;
@@ -34,25 +30,24 @@ vimlet.meta = vimlet.meta || {};
   vimlet.meta.decodeHTML = vimlet.meta.decodeHTML || true;
   vimlet.meta.__decodeEntityRegex = /&(?:#x[a-f0-9]+|#[0-9]+|[a-z0-9]+);?/ig;
 
-  vimlet.meta.parse = function (text, options, callback) {
-    options = options || {};
+  vimlet.meta.parse = function (scope, text, data, callback) {
+
     if (vimlet.meta.decodeHTML) {
       text = vimlet.meta.__decodeHTMLEntities(text);
     }
 
     vimlet.meta.__setTags();
-    var __sandbox = vimlet.meta.__createSandbox(options.scope);
-    __sandbox.data = options.data || {};
+    var __sandbox = vimlet.meta.__createSandbox(scope);
+    __sandbox.data = data || {};
     var result = __sandbox.__parse(text);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
   };
 
-  vimlet.meta.parseTemplate = function (template, options, callback) {
-    options = options || {};
+  vimlet.meta.parseTemplate = function (scope, template, data, callback) {
     vimlet.meta.__setTags();
-    var __sandbox = vimlet.meta.__createSandbox(options.scope);
-    __sandbox.data = options.data || {};
+    var __sandbox = vimlet.meta.__createSandbox(scope);
+    __sandbox.data = data || {};
     var result = __sandbox.__parseTemplate(template);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
@@ -105,65 +100,6 @@ vimlet.meta = vimlet.meta || {};
     );
   };
 
-  // Remove comments from commented tags
-  vimlet.meta.__cleanCommented = function (t) {
-    vimlet.meta.commentTags.forEach(function (tag) {
-      var regex;
-      if (Array.isArray(tag)) {
-        tag[0] = tag[0] || "";
-        tag[1] = tag[1] || "";
-        regex = new RegExp(
-          vimlet.meta.__escapeRegExp(tag[0]) + "\\s*" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
-          "(?:(?!" +
-          vimlet.meta.__escapeRegExp(tag[0]) + "\\s*" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
-          ")[\\s\\S])*" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
-          "\\s*" + vimlet.meta.__escapeRegExp(tag[1]) +
-          "(\\r\\n|\\r|\\n){0,1}",
-          "g"
-        );
-        // Replace template with evalMatches
-        t = t.replace(regex, function (match) {
-          match = match.trim();
-          // Remove tags
-          match = match
-            .substring(
-              tag[0].length,
-              match.length - tag[1].length
-            )
-            .trim();
-          return match;
-        });
-      } else {
-        tag = tag || "";           
-        regex = new RegExp(
-          vimlet.meta.__escapeRegExp(tag) + "( |\\t)*" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
-          "(?:(?!" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
-          ")[\\s\\S])*" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose),
-          "g"
-        );   
-        // Replace template with evalMatches
-        t = t.replace(regex, function (match) {
-          match = match.trim();
-          // Remove tags
-          match = match
-            .substring(
-              tag.length,
-              match.length
-            )
-            .trim();
-          return match;
-        });                  
-      }
-    });
-    return t;
-  }
-
   // Escape special characters from tags
   vimlet.meta.__escapeRegExp = function (str) {
     return str.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
@@ -176,61 +112,94 @@ vimlet.meta = vimlet.meta || {};
     return s;
   };
 
-
-  vimlet.meta.__fileProvider = vimlet.meta.__fileProvider || function (path, callback) {
-    // TODO replace XMLHttpRequest by window.fetch with synchronous support
-    // Browser
-    var xhttp = new XMLHttpRequest();
-
-    xhttp.onreadystatechange = function () {
-      if (this.readyState === 4) {
-        if (this.status === 200) {
-          if (callback) {
-            // Must be asynchronous
-            callback(xhttp.responseText);
-          }
-        } else {
-          console.log("File error: " + this.status);
-        }
-      }
-    };
-
-    if (callback) {
-      // Must be asynchronous
-      xhttp.open("GET", path, true);
-      xhttp.send();
-    } else {
-      // Must be synchronous
-      xhttp.open("GET", path, false);
-      xhttp.send();
-      return xhttp.responseText;
-    }
-  };
-
   vimlet.meta.__getFile = function (path, callback) {
-    if(callback) {
-      vimlet.meta.__fileProvider(path, callback);
-    } else {
-      return vimlet.meta.__fileProvider(path);    
-    }
-  };
+    if (vimlet.meta.engine == "node") {
+      // node command
+      if (!require_fs) {
+        require_fs = require("fs");
+      }
 
-  vimlet.meta.__sandboxProvider = vimlet.meta.__sandboxProvider || function (sandbox) {
-    // Browser sandbox
-    iframe = document.createElement("iframe");
-    iframe.style.display = "none";
-    iframe.setAttribute(
-      "sandbox",
-      "allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
-    );
-    document.body.appendChild(iframe);
-    return iframe.contentWindow;
+      if (callback) {
+        // Must be asynchronous
+        require_fs.readFile(path, "utf8", function (error, buf) {
+          if (error) {
+            console.log(error);
+          } else {
+            callback(buf.toString());
+          }
+        });
+      } else {
+        // Must be synchronous
+        return require_fs.readFileSync(path, "utf8").toString();
+      }
+    } else {
+      // TODO replace XMLHttpRequest by window.fetch with synchronous support
+      // Browser
+      var xhttp = new XMLHttpRequest();
+
+      xhttp.onreadystatechange = function () {
+        if (this.readyState === 4) {
+          if (this.status === 200) {
+            if (callback) {
+              // Must be asynchronous
+              callback(xhttp.responseText);
+            }
+          } else {
+            console.log("File error: " + this.status);
+          }
+        }
+      };
+
+      if (callback) {
+        // Must be asynchronous
+        xhttp.open("GET", path, true);
+        xhttp.send();
+      } else {
+        // Must be synchronous
+        xhttp.open("GET", path, false);
+        xhttp.send();
+        return xhttp.responseText;
+      }
+    }
   };
 
   vimlet.meta.__createSandbox = function (scope) {
     var sandbox = eval.call(null, "this");
 
-    sandbox = vimlet.meta.__sandboxProvider(sandbox);
+    if (vimlet.meta.engine == "node") {
+      if (!require_vm) {
+        require_vm = require("vm");
+      }
+
+      // Clone node global scope to baseContext
+      var baseContext = Object.assign({}, sandbox);
+
+      // Add other node global modules to baseContext
+
+      // exports
+      // require
+      // module
+      // __filename
+      // __dirname
+
+      baseContext.exports = exports;
+      baseContext.require = require;
+      baseContext.module = module;
+      baseContext.__filename = __filename;
+      baseContext.__dirname = __dirname;
+
+      sandbox = new require_vm.createContext(baseContext);
+    } else {
+      // Browser sandbox
+      iframe = document.createElement("iframe");
+      iframe.style.display = "none";
+      iframe.setAttribute(
+        "sandbox",
+        "allow-same-origin allow-scripts allow-popups allow-forms allow-modals"
+      );
+      document.body.appendChild(iframe);
+      sandbox = iframe.contentWindow;
+    }
 
     // Inject scope
     if (scope) {
@@ -252,10 +221,6 @@ vimlet.meta = vimlet.meta || {};
     sandbox = null;
   };
 
-  vimlet.meta.__evalProvider = function (s, sandbox) {
-    sandbox.eval.call(null, s);
-  };
-
   vimlet.meta.__injectSandboxFunctions = function (sandbox) {
     sandbox.__output = "";
 
@@ -266,14 +231,14 @@ vimlet.meta = vimlet.meta || {};
     };
 
     sandbox.template = function (t) {
-      var __fullPath = (sandbox.__basePath != "" ? sandbox.__basePath + "/" : "") + t;
+      var __fullPath = sandbox.__basePath + "/" + t;
       var storedOutput = sandbox.__output;
       var parsedTemplate = sandbox.__parseTemplate(__fullPath);
       sandbox.__output = storedOutput + parsedTemplate;
     };
 
     sandbox.include = function (t) {
-      var __fullPath = (sandbox.__basePath != "" ? sandbox.__basePath + "/" : "") + t;
+      var __fullPath = sandbox.__basePath + "/" + t;
       var parsedTemplate = sandbox.__includeTemplate(__fullPath);
     };
 
@@ -281,17 +246,18 @@ vimlet.meta = vimlet.meta || {};
       sandbox.__output = "";
       sandbox.__basePath = basepath;
 
-      vimlet.meta.__evalProvider(s, sandbox);
+      if (vimlet.meta.engine == "node") {
+        var script = new require_vm.Script(s);
+        script.runInContext(sandbox);
+      } else {
+        sandbox.eval.call(null, s);
+      }
 
       return sandbox.__output;
     };
 
     sandbox.__parse = function (t, templatePath) {
       var result = "";
-
-      if (vimlet.meta.parseCommented) {
-        t = vimlet.meta.__cleanCommented(t);
-      }
 
       if (!templatePath) {
         templatePath = "";
@@ -370,6 +336,7 @@ vimlet.meta = vimlet.meta || {};
       // Remove first /
       base = base.substring(1, base.length);
     }
+
     return base;
   };
 
@@ -430,7 +397,3 @@ vimlet.meta = vimlet.meta || {};
   };
 
 }.apply(vimlet.meta));
-
-return vimlet.meta;
-
-}

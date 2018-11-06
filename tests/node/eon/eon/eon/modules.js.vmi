@@ -1,0 +1,37 @@
+
+// ############################################################################################
+// CORE MODULES
+// ############################################################################################
+
+<% template("modules/object.js"); %>
+
+<% template("modules/callback.js"); %>
+
+<% template("modules/dom.js"); %>
+
+<% template("modules/import.js"); %>
+
+<% template("modules/registry.js"); %>
+
+<% template("modules/interpolation.js"); %>
+
+<% template("modules/element.js.vmi"); %>
+
+<% template("modules/observer.js"); %>
+
+<% template("modules/time.js"); %>
+
+<% template("modules/resize.js.vmi"); %>
+
+<% template("modules/util.js"); %>
+
+<% template("modules/pwa/pwa.js"); %>
+
+<% template("modules/navigation.js"); %>
+
+<% template("modules/data/store.js"); %>
+
+<% template("modules/data/endpoint.js"); %>
+
+<% template("modules/validator.js"); %>
+
