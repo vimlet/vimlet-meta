@@ -1,29 +1,16 @@
 {
   "name": "@vimlet/meta",
-  "version": "2.0.15",
+  "version": "2.0.16",
   "description": "",
-  "main": "./src/node/index.js",
+  "main": "src/node/index.js",
   "bin": {
-    "vimlet-meta": "./src/node/index.js"
+    "vimlet-meta": "src/node/index.js"
   },
   "scripts": {
-    "build": "node scripts/build.js",
-    "format:js": "alpha format-js",
-    "format:html": "alpha format-html",
-    "format:css": "alpha format-css",
-    "format": "run-s format:js format:html format:css",
-    "test": "alpha test",
-    "doc:api": "alpha doc api -i **/*.js,**/*.html -o ../docs/api",
-    "doc:article": "alpha doc article -i ../docs/md/**/*.md -o ../docs/article",
-    "doc": "run-s doc:api doc:article",
-    "readme": "alpha readme",
-    "badges": "alpha badges -o badges"
+    "build": "node scripts/build.js"
   },
   "author": "",
   "license": "MIT",
-  "optionalDependencies": {
-    "@vimlet/alpha": "0.1.29"
-  },
   "dependencies": {
     "@vimlet/io": "0.0.7",
     "@vimlet/cli": "1.2.4",
