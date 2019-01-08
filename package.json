@@ -17,6 +17,7 @@
     "fs-extra": "4.0.1",
     "js-yaml": "3.8.4",
     "mkdirp": "0.5.1",
-    "glob-watcher": "4.0.0"
+    "glob-watcher": "4.0.0",
+    "deasync": "0.1.14"
   }
 }

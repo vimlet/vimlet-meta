@@ -6,6 +6,7 @@ var glob = require("glob");
 var fs = require("fs-extra");
 var cli = require("@vimlet/cli").instantiate();
 var watch = require("./lib/watch");
+var deasync = require("deasync");
 
 // Node require
 var require_fs;
@@ -120,7 +121,7 @@ module.exports.parseTemplateGlob = function (include, options, callback) {
   options = options || {};
   var rootsArray = io.getFiles(include, options);
   rootsArray.forEach(function (rootObject) {
-    rootObject.files.forEach(function (relativePath) {
+    rootObject.files.forEach(function (relativePath) {      
       module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
         callback(error, {
           relativePath: relativePath,
@@ -152,6 +153,20 @@ module.exports.parseTemplateGlobAndWrite = function (include, output, options, c
   if (callback) {
     callback();
   }
+};
+
+
+// @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
+module.exports.parseTemplateGlobAndWriteSync = function (include, output, options) {  
+  var done = false;
+  var data;
+  module.exports.parseTemplateGlobAndWrite(include, output, options, function cb(res) {
+      data = res;
+      done = true;
+  });
+  deasync.loopWhile(function () {
+      return !done;
+  }); 
 };
 
 
@@ -222,7 +237,7 @@ if (!module.parent) {
       }
       module.exports.watch(include, output, options);
     } else {
-      module.exports.parseTemplateGlobAndWrite(include, output, options);
+      module.exports.parseTemplateGlobAndWriteSync(include, output, options);
     }
   }
 
