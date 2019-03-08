@@ -1,6 +1,6 @@
 var watch = require('glob-watcher');
 var path = require("path");
-var io = require("@vimlet/io");
+var io = require("@vimlet/commons-io");
 var fs = require("fs-extra");
 
 exports.watch = function (include, output, options) {
