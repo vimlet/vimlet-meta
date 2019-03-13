@@ -1,6 +1,6 @@
 {
   "name": "@vimlet/meta",
-  "version": "2.1.1",
+  "version": "2.1.2",
   "description": "",
   "main": "src/node/index.js",
   "bin": {
@@ -12,7 +12,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@vimlet/commons-io": "0.0.8",
+    "@vimlet/commons-io": "0.0.9",
     "@vimlet/cli": "1.2.6",
     "fs-extra": "4.0.1",
     "js-yaml": "3.8.4",
