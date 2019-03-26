@@ -99,8 +99,7 @@ vimlet.meta = vimlet.meta || {};
       "(?:(?!" +
       vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
       ")[\\s\\S])*" +
-      vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
-      "(\\r\\n|\\r|\\n){0,1}",
+      vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose),
       "g"
     );
   };

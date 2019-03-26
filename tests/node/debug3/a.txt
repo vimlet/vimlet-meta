@@ -1,2 +1,0 @@
-I'm another 
-<% template("test/b.vmi") %>
