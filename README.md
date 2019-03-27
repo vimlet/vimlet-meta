@@ -21,6 +21,10 @@ npm install @vimlet/meta
 
     Returns the result of given template.
 
+* `meta.parseTemplate(template, options, callback);`
+
+    Returns the result of given template file.
+
 * `meta.parseTemplateGlob(include, options, callback);`
 
     Returns an object with the result. `{"relativePath":"",
@@ -41,7 +45,7 @@ npm install @vimlet/meta
         "data": {},
         "clean": false
     }`
-
+ 
     * exclude: Used to skip files that you don't want to parse.
     * output: Directory where files will be written using parseTemplateGlobAndWrite.
     * data: Data to be bind.
