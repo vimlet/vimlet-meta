@@ -113,13 +113,13 @@ module.exports.parse = function () {
 module.exports.parseTemplate = function () {
   convertToNodeCallback(baseParseTemplate).apply(null, arguments);
 };
-
+ 
 
 // Node engine specific functions
 // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
-module.exports.parseTemplateGlob = function (include, options, callback) {
+module.exports.parseTemplateGlob = async function (include, options, callback) {
   options = options || {};
-  var rootsArray = io.getFiles(include, options);
+  var rootsArray = await io.getFiles(include, options);
   rootsArray.forEach(function (rootObject) {
     rootObject.files.forEach(function (relativePath) {      
       module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
@@ -172,7 +172,7 @@ module.exports.parseTemplateGlobAndWriteSync = function (include, output, option
 
 // @function watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder, watchdirectory:watch directories for changes and compile watch files] @param callback
 module.exports.watch = function (include, output, options) {
-  module.exports.parseTemplateGlobAndWrite(include, output, options);
+  module.exports.parseTemplateGlobAndWrite(include, output, options);  
   watch.watch(include, output, options);
   if (options && options.watchdirectory) {
     watch.watchDirectory(options.watchdirectory, include, function () {

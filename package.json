@@ -12,7 +12,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@vimlet/commons-io": "0.0.12",
+    "@vimlet/commons-io": "0.1.2",
     "@vimlet/cli": "1.2.6",
     "fs-extra": "4.0.1",
     "js-yaml": "3.13.0",

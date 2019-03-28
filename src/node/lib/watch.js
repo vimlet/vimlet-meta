@@ -3,7 +3,7 @@ var path = require("path");
 var io = require("@vimlet/commons-io");
 var fs = require("fs-extra");
 
-exports.watch = function (include, output, options) {
+exports.watch = function (include, output, options) {  
   var meta = require("../index.js");
   options = options || {};
   options.clean = false;
@@ -11,28 +11,33 @@ exports.watch = function (include, output, options) {
   var watcher = watch(include, {
     events: ['add', 'change', 'unlink', 'addDir', 'unlinkDir']
   });
-  watcher.on('change', function (filePath, stat) {
-    if (!isExcluded(options.exclude, filePath)) {
+  watcher.on('change', async function (filePath, stat) {    
+    var excluded = await io.isInPattern(filePath, options.exclude, null);    
+    if (!excluded) {
       // Relative output is where the template will be saved after parsed
-      var relativeOutput = getRelativeOutput(include, output, filePath);
+      var relativeOutput = await io.getRelativeOutput(include, output, filePath, null);
       // Parse modified file      
       meta.parseTemplateGlobAndWrite(filePath, relativeOutput, options);
       console.log("Changed --> ", filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
     }
   });
-  watcher.on('add', function (filePath, stat) {
-    if (!isExcluded(options.exclude, filePath)) {
+  watcher.on('add', async function (filePath, stat) {
+    var excluded = await io.isInPattern(filePath, options.exclude, null);
+    if (!excluded) {
       // Relative output is where the template will be saved after parsed
-      var relativeOutput = getRelativeOutput(include, output, filePath);
+      var relativeOutput = await io.getRelativeOutput(include, output, filePath, null);
       // Parse modified file
       meta.parseTemplateGlobAndWrite(filePath, relativeOutput, options);
       console.log("Added --> ", filePath + " => " + path.join(relativeOutput, path.basename(filePath, ".vmt")));
     }
   });
-  watcher.on('unlink', function (filePath, stat) {
-    if (!isExcluded(options.exclude, filePath)) {
+  watcher.on('unlink', async function (filePath, stat) {
+    var excluded = await io.isInPattern(filePath, options.exclude, null);
+    if (!excluded) {
       // Relative output is where the template will be saved after parsed
-      var relativeOutput = getRelativeOutput(include, output, filePath, true);
+      var relativeOutput = await io.getRelativeOutput(include, output, filePath, {
+        deleted: true
+      });
       var parsedPath = path.join(relativeOutput, path.basename(filePath, ".vmt"));
       if (fs.existsSync(parsedPath)) {
         fs.unlinkSync(parsedPath);
@@ -40,14 +45,16 @@ exports.watch = function (include, output, options) {
       }
     }
   });
-  watcher.on('addDir', function (filePath, stat) {
-    var relativeOutput = getRelativeOutput(include, output, filePath);
+  watcher.on('addDir', async function (filePath, stat) {
+    var relativeOutput = await io.getRelativeOutput(include, output, filePath, null);
     fs.mkdirs(path.join(relativeOutput, path.basename(filePath)), function () {
       console.log("Folder created --> ", filePath, "=>", path.join(relativeOutput, path.basename(filePath)));
     });
   });
-  watcher.on('unlinkDir', function (filePath, stat) {
-    var relativeOutput = getRelativeOutput(include, output, filePath, true);
+  watcher.on('unlinkDir', async function (filePath, stat) {
+    var relativeOutput = await io.getRelativeOutput(include, output, filePath, {
+      deleted: true
+    });
     fs.remove(path.join(relativeOutput, path.basename(filePath)), function () {
       console.log("Folder removed --> ", path.join(relativeOutput, path.basename(filePath)));
     });
@@ -66,29 +73,33 @@ exports.watchDirectory = function (include, exclude, callback) {
   var watcher = watch(include, {
     events: ['add', 'change', 'unlink', 'unlinkDir']
   });
-  watcher.on('change', function (filePath, stat) {
-    if (!isExcluded(exclude, filePath)) {
+  watcher.on('change', async function (filePath, stat) {
+    var excluded = await io.isInPattern(filePath, exclude, null);
+    if (!excluded) {
       console.log("Changed --> ", filePath);
       callback();
     }
   });
-  watcher.on('add', function (filePath, stat) {
-    if (!isExcluded(exclude, filePath)) {
+  watcher.on('add', async function (filePath, stat) {
+    var excluded = await io.isInPattern(filePath, exclude, null);
+    if (!excluded) {
       console.log("Added --> ", filePath);
       callback();
     }
   });
-  watcher.on('unlink', function (filePath, stat) {
-    if (!isExcluded(exclude, filePath)) {
+  watcher.on('unlink', async function (filePath, stat) {
+    var excluded = await io.isInPattern(filePath, exclude, null);
+    if (!excluded) {
       console.log("Removed --> ", filePath);
       callback();
     }
   });
-  watcher.on('unlinkDir', function (filePath, stat) {
-    if (!isExcluded(exclude, filePath)) {
+  watcher.on('unlinkDir', async function (filePath, stat) {
+    var excluded = await io.isInPattern(filePath, exclude, null);
+    if (!excluded) {
       console.log("Directory removed --> ", filePath);
       callback();
-    }
+    } 
   });
   watcher.on('error', function (error) {
     if (process.platform === 'win32' && error.code === 'EPERM') {
@@ -98,56 +109,3 @@ exports.watchDirectory = function (include, exclude, callback) {
     }
   });
 };
-
-
-/*
-@function getRelativeOutput [Get path relative to output]
-@param include [Include patterns]
-@param output
-@param filePath
-@param deleted [Flag to know if the file was deleted so it skips files in pattern check]
-*/
-function getRelativeOutput(include, output, filePath, deleted) {
-  var relativeOutput;
-  if (!Array.isArray(include)) {
-    if (io.isInPattern(filePath, include) || deleted) {
-      var rootFromPattern = io.getRootFromPattern(include);
-      // Relative output is where the template will be saved after parse
-      relativeOutput = path.dirname(path.relative(rootFromPattern, filePath));
-      relativeOutput = path.join(output, relativeOutput);
-    }
-  } else {
-    include.forEach(function (incl) {
-      if (io.isInPattern(filePath, incl) || deleted) {
-        var rootFromPattern = io.getRootFromPattern(incl);
-        // Relative output is where the template will be saved after parse
-        relativeOutput = path.dirname(path.relative(rootFromPattern, filePath));
-        relativeOutput = path.join(output, relativeOutput);
-      }
-    });
-  }
-  return relativeOutput;
-}
-
-/*
-@function isExcluded [Check if a file is excluded. This function is used because watch doesn't accept exclude patterns]
-@param excluded [exclude patterns]
-@param filePath
-@return boolean
-*/
-function isExcluded(excluded, filePath) {
-  if (!excluded) {
-    return false;
-  }
-  if (!Array.isArray(excluded)) {
-    return io.isInPattern(filePath, excluded);
-  } else {
-    var isIn = false;
-    excluded.forEach(function (excl) {
-      if (io.isInPattern(filePath, excl)) {
-        isIn = true;
-      }
-    });
-    return isIn;
-  }
-}
