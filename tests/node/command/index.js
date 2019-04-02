@@ -4,8 +4,17 @@ var path = require("path");
 
 var include = path.join(__dirname, "resources/**/*.vmt");
 var output = path.join(__dirname, "output");
+var data = path.join(__dirname, "resources/data.json");
 
-commons.run.exec("node", {args:[metaBin, "-i", include, "-o", output]}, function (error, data) {
+// commons.run.exec("node", {args:[metaBin, "-i", include, "-o", output, "-d", data]}, function (error, data) {
+//   if (error) {
+//     console.error(error);
+//   } else {
+//     console.log("done!");
+//   }
+// });
+
+commons.run.exec("node", {args:[metaBin, "-i", include, "-o", output, "-d", data , "-w", "resources"]}, function (error, data) {
   if (error) {
     console.error(error);
   } else {

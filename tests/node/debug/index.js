@@ -8,8 +8,9 @@ var path = require("path");
 // meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*"), path.join(__dirname, "output"), {exclude:"resources/excluded/*"});
 
 // Works without errors because it just parse .vmt files
-meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*.vmt"), path.join(__dirname, "output"), {exclude:"resources/excluded/*"});
+// meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*.vmt"), path.join(__dirname, "output"), {exclude:"resources/excluded/*"});
 
+meta.watch(path.join(__dirname, "resources"), path.join(__dirname, "output"), {exclude:"resources/excluded/*",watchdirectory:"resources",data:"resources/data.json"});
 
 // Get open with chrome param
 // var cli = require("@vimlet/cli").instantiate();

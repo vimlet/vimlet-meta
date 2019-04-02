@@ -10,3 +10,5 @@
     <% template("index/body.html") %>
 </body>
 </html>
+
+<%= data.text %>

@@ -7,6 +7,7 @@ var fs = require("fs-extra");
 var cli = require("@vimlet/cli").instantiate();
 var watch = require("./lib/watch");
 var deasync = require("deasync");
+var cwd = process.cwd();
 
 // Node require
 var require_fs;
@@ -70,14 +71,14 @@ module.exports.__fileProvider = function (filePath, callback) {
     // Must be synchronous    
     try {
       return fs.readFileSync(fixedPath, "utf8").toString();
-    } catch (error) {   
-      if(error.path){
-        console.log();        
+    } catch (error) {
+      if (error.path) {
+        console.log();
         console.log("Error, file not found: ", error.path);
-        console.log();        
-      }else{
+        console.log();
+      } else {
         console.log(error);
-        
+
       }
     }
   }
@@ -113,7 +114,7 @@ module.exports.parse = function () {
 module.exports.parseTemplate = function () {
   convertToNodeCallback(baseParseTemplate).apply(null, arguments);
 };
- 
+
 
 // Node engine specific functions
 // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
@@ -121,7 +122,7 @@ module.exports.parseTemplateGlob = async function (include, options, callback) {
   options = options || {};
   var rootsArray = await io.getFiles(include, options);
   rootsArray.forEach(function (rootObject) {
-    rootObject.files.forEach(function (relativePath) {      
+    rootObject.files.forEach(function (relativePath) {
       module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
         callback(error, {
           relativePath: relativePath,
@@ -157,26 +158,54 @@ module.exports.parseTemplateGlobAndWrite = function (include, output, options, c
 
 
 // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
-module.exports.parseTemplateGlobAndWriteSync = function (include, output, options) {  
+module.exports.parseTemplateGlobAndWriteSync = function (include, output, options) {
   var done = false;
   var data;
   module.exports.parseTemplateGlobAndWrite(include, output, options, function cb(res) {
-      data = res;
-      done = true;
+    data = res;
+    done = true;
   });
   deasync.loopWhile(function () {
-      return !done;
-  }); 
+    return !done;
+  });
 };
 
 
 // @function watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder, watchdirectory:watch directories for changes and compile watch files] @param callback
 module.exports.watch = function (include, output, options) {
-  module.exports.parseTemplateGlobAndWrite(include, output, options);  
+  var optionsCopy = JSON.parse(JSON.stringify(options));
+  if (options.data && typeof options.data != "object") {
+    var currentPath = options.data;
+    if (!path.isAbsolute(currentPath)) {
+      currentPath = path.join(cwd, options.data);
+    }
+    if (fs.existsSync(currentPath)) {
+      optionsCopy.data = JSON.parse(fs.readFileSync(currentPath));
+    }
+  }
+  module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
   watch.watch(include, output, options);
   if (options && options.watchdirectory) {
-    watch.watchDirectory(options.watchdirectory, include, function () {
-      module.exports.parseTemplateGlobAndWrite(include, output, options);
+    watch.watchDirectory(options.watchdirectory, options.exclude, function () {
+      var optionsCopy = JSON.parse(JSON.stringify(options));
+      if (options.data && typeof options.data != "object") {
+        var currentPath = options.data;
+        if (!path.isAbsolute(currentPath)) {
+          currentPath = path.join(cwd, options.data);
+        }
+        fs.stat(currentPath, function (err, data) {
+          if (!err) {
+            fs.readJson(currentPath, function (error, data) {
+              if (!error) {
+                optionsCopy.data = JSON.parse(fs.readFileSync(currentPath));
+                module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
+              }
+            });
+          }
+        });
+      } else {
+        module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
+      }
     });
   }
 };
@@ -204,16 +233,35 @@ if (!module.parent) {
     .flag("-h", "--help", "Shows help")
     .parse(process.argv);
 
-  var cwd = process.cwd();
 
   var readData = null;
   if (cli.result.data) {
-    if (fs.existsSync(path.join(cwd, cli.result.data))) {
-      readData = JSON.parse(fs.readFileSync(path.join(cwd, cli.result.data)));
+    var currentPath = cli.result.data;
+    if (!path.isAbsolute(currentPath)) {
+      currentPath = path.join(cwd, cli.result.data);
+    }
+    // var readData = null;
+    // fs.stat(currentPath, function (err, data) {
+    //   if (!err) {
+    //     fs.readJson(currentPath, function (error, data) {
+    //       if (!error) {
+    //         readData = data;
+    //       }
+    //     });
+    //   }
+    // });
+    // readDataFromDisk(cli.result.data).then(function(data){
+    //   console.log("PROM",data);
+
+    // });
+
+
+    if (fs.existsSync(currentPath)) {
+      readData = JSON.parse(fs.readFileSync(currentPath));
     }
   }
   if (cli.result.preventCommented) {
-    module.exports.parseCommented = false;    
+    module.exports.parseCommented = false;
   }
 
   var include = cli.result.include || path.join(cwd, "**/*.vmt");
@@ -232,6 +280,7 @@ if (!module.parent) {
     cli.printHelp();
   } else {
     if (cli.result.watch) {
+      options.data = cli.result.data ? cli.result.data : options.data;
       if (typeof (cli.result.watch) != "boolean") {
         options.watchdirectory = cli.result.watch;
       }
@@ -242,3 +291,26 @@ if (!module.parent) {
   }
 
 }
+
+
+// function readDataFromDisk(givenPath){
+//   return new Promise(function (resolve, reject) {
+//   var currentPath = givenPath;
+//   if (!path.isAbsolute(currentPath)) {
+//     currentPath = path.join(cwd, givenPath);
+//   }
+//   fs.stat(currentPath, function (err, data) {
+//     if (!err) {
+//       fs.readJson(currentPath, function (error, data) {
+//         if (!error) {
+//           resolve(data);
+//         }else{
+//           reject();
+//         }
+//       });
+//     }else{
+//       reject();
+//     }
+//   });
+// });
+// }
