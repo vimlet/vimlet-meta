@@ -1,5 +1,6 @@
 #!/usr/bin/env node
- //@header Parse templates into files.
+
+//@header Parse templates into files.
 var io = require("@vimlet/commons-io");
 var path = require("path");
 var glob = require("glob");

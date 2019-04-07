@@ -136,7 +136,7 @@ vimlet.meta = vimlet.meta || {};
           return match;
         });
       } else {
-        tag = tag || "";           
+        tag = tag || "";
         regex = new RegExp(
           vimlet.meta.__escapeRegExp(tag) + "( |\\t)*" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
@@ -145,7 +145,7 @@ vimlet.meta = vimlet.meta || {};
           ")[\\s\\S])*" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose),
           "g"
-        );   
+        );
         // Replace template with evalMatches
         t = t.replace(regex, function (match) {
           match = match.trim();
@@ -157,7 +157,7 @@ vimlet.meta = vimlet.meta || {};
             )
             .trim();
           return match;
-        });                  
+        });
       }
     });
     return t;
@@ -207,10 +207,10 @@ vimlet.meta = vimlet.meta || {};
   };
 
   vimlet.meta.__getFile = function (path, callback) {
-    if(callback) {
+    if (callback) {
       vimlet.meta.__fileProvider(path, callback);
     } else {
-      return vimlet.meta.__fileProvider(path);    
+      return vimlet.meta.__fileProvider(path);
     }
   };
 
@@ -340,10 +340,14 @@ vimlet.meta = vimlet.meta || {};
         key = customSandboxKeys[i];
         value = vimlet.meta.sandbox[key];
         if (typeof value === "function") {
-          // Inject sandbox scope if its a function
-          sandbox[key] = function () {
-            value.apply(sandbox, arguments);
-          };
+          // Clone function and inject sandbox scope
+          sandbox[key] = value.bind(sandbox);
+        } else if (Array.isArray(value)) {
+          // Clone array
+          sandbox[key] = value.slice(0);
+        } else if (typeof value === "object") {
+          // Clone object
+          sandbox[key] = Object.assign({}, value);
         } else {
           // Inject directly for any other property
           sandbox[key] = value;
