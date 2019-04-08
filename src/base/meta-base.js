@@ -117,8 +117,7 @@ vimlet.meta = vimlet.meta || {};
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
           ")[\\s\\S])*" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
-          "\\s*" + vimlet.meta.__escapeRegExp(tag[1]) +
-          "(\\r\\n|\\r|\\n){0,1}",
+          "\\s*" + vimlet.meta.__escapeRegExp(tag[1]),
           "g"
         );
         // Replace template with evalMatches
