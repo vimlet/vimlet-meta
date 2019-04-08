@@ -99,7 +99,8 @@ vimlet.meta = vimlet.meta || {};
       "(?:(?!" +
       vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
       ")[\\s\\S])*" +
-      vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose),
+      vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
+      "(\\r\\n|\\r|\\n){0,1}",
       "g"
     );
   };
@@ -119,7 +120,8 @@ vimlet.meta = vimlet.meta || {};
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
           ")[\\s\\S])*" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
-          "\\s*" + vimlet.meta.__escapeRegExp(tag[1]),
+          "\\s*" + vimlet.meta.__escapeRegExp(tag[1]) +
+          "(\\r\\n|\\r|\\n){0,1}",
           "g"
         );
         // Replace template with evalMatches
@@ -142,7 +144,8 @@ vimlet.meta = vimlet.meta || {};
           "(?:(?!" +
           vimlet.meta.__escapeRegExp(vimlet.meta.__tagOpen) +
           ")[\\s\\S])*" +
-          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose),
+          vimlet.meta.__escapeRegExp(vimlet.meta.__tagClose) +
+          "(\\r\\n|\\r|\\n){0,1}",
           "g"
         );
         // Replace template with evalMatches
@@ -300,9 +303,14 @@ vimlet.meta = vimlet.meta || {};
 
       // Replace template with evalMatches
       result = t.replace(vimlet.meta.__regex, function (match) {
-        endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);
+        endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);        
         match = vimlet.meta.__cleanMatch(match);
-        return sandbox.__eval(match, vimlet.meta.__getBasePath(templatePath)) + endOfLine;
+        var res = sandbox.__eval(match, vimlet.meta.__getBasePath(templatePath));
+        if(res){
+          return res + endOfLine;
+        }else{
+          return res;
+        }
       });
 
       //Replace line break.
@@ -410,24 +418,15 @@ vimlet.meta = vimlet.meta || {};
   };
 
   vimlet.meta.__preserveNewLineIfNeeded = function (match) {
-
     // Remove start spaces with regex since trimLeft is not IE compatible
     match = match.replace(/^\s+/, "");
-
     var endOfLine = "";
-
-    // Return endOfLine if echo found
-    if (match.match(new RegExp("(^" + vimlet.meta.__tagOpen + vimlet.meta.__tagEcho + "|echo(.*);|template(.*);)", "g"))) {
-
       // Determine match end of line
       var endsWithNewLine = match.match(new RegExp("(\\r\\n$|\\r$|\\n$)", "g"));
 
       if (endsWithNewLine) {
         endOfLine = endsWithNewLine[0];
       }
-
-    }
-
     return endOfLine;
   };
 

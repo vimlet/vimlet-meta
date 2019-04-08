@@ -1,0 +1,14 @@
+Name: <%= data.name %>. Last: <%= data.last %>
+
+After line break
+Next line will be empty tag
+<% %>
+After empty tag
+Next line will be a tag with echo
+<% echo("echo"); %>
+Last line was echo
+Next line will include a template
+<% template("include/include.txt");%>
+Next line will include an empty template which will be skipped
+<% template("include/empty.txt");%>
+I am after empty template

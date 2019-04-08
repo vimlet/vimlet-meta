@@ -1,0 +1,12 @@
+Name: Peter. Last: Pan
+
+After line break
+Next line will be empty tag
+After empty tag
+Next line will be a tag with echo
+echo
+Last line was echo
+Next line will include a template
+Text from include template
+Next line will include an empty template which will be skipped
+I am after empty template

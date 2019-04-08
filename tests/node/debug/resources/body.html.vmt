@@ -9,8 +9,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-    <% template("index/body.html") %> 
+    <% template("index/body.html") %>
 </body>
 </html>
-
-<%= data.text %>

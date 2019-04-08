@@ -241,21 +241,6 @@ if (!module.parent) {
     if (!path.isAbsolute(currentPath)) {
       currentPath = path.join(cwd, cli.result.data);
     }
-    // var readData = null;
-    // fs.stat(currentPath, function (err, data) {
-    //   if (!err) {
-    //     fs.readJson(currentPath, function (error, data) {
-    //       if (!error) {
-    //         readData = data;
-    //       }
-    //     });
-    //   }
-    // });
-    // readDataFromDisk(cli.result.data).then(function(data){
-    //   console.log("PROM",data);
-
-    // });
-
 
     if (fs.existsSync(currentPath)) {
       readData = JSON.parse(fs.readFileSync(currentPath));
@@ -292,26 +277,3 @@ if (!module.parent) {
   }
 
 }
-
-
-// function readDataFromDisk(givenPath){
-//   return new Promise(function (resolve, reject) {
-//   var currentPath = givenPath;
-//   if (!path.isAbsolute(currentPath)) {
-//     currentPath = path.join(cwd, givenPath);
-//   }
-//   fs.stat(currentPath, function (err, data) {
-//     if (!err) {
-//       fs.readJson(currentPath, function (error, data) {
-//         if (!error) {
-//           resolve(data);
-//         }else{
-//           reject();
-//         }
-//       });
-//     }else{
-//       reject();
-//     }
-//   });
-// });
-// }
