@@ -11,6 +11,9 @@ It is a tool that generate files from templates.
 * Glob patters to search for template files.
 * Watcher to look for changes and update files on the fly.
 
+
+You can access the source code at [vimlet/meta](https://github.com/vimlet/vimlet-meta)
+
 ## Installation
 
 npm install @vimlet/meta
