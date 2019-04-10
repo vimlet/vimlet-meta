@@ -9,6 +9,10 @@
   "scripts": {
     "build": "node scripts/build.js"
   },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/vimlet/vimlet-meta"
+  },
   "author": "",
   "license": "MIT",
   "dependencies": {
