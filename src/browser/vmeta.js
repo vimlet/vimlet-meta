@@ -206,6 +206,7 @@ vimlet.meta = vimlet.meta || {};
     }
   };
 
+
   vimlet.meta.__getFile = function (path, callback) {
     if (callback) {
       vimlet.meta.__fileProvider(path, callback);
@@ -257,7 +258,6 @@ vimlet.meta = vimlet.meta || {};
 
   vimlet.meta.__injectSandboxFunctions = function (sandbox) {
     sandbox.__output = "";
-
     sandbox.__basePath = "";
 
     sandbox.echo = function (s) {
@@ -265,15 +265,21 @@ vimlet.meta = vimlet.meta || {};
     };
 
     sandbox.template = function (t) {
-      var __fullPath = (sandbox.__basePath != "" ? sandbox.__basePath + "/" : "") + t;
+      var __fullPath = t;
+      if(sandbox.__basePath != "" && t.indexOf("/") != 0 ){
+        __fullPath = sandbox.__basePath + "/" + t
+      }
       var storedOutput = sandbox.__output;
       var parsedTemplate = sandbox.__parseTemplate(__fullPath);
       sandbox.__output = storedOutput + parsedTemplate;
     };
 
     sandbox.include = function (t) {
-      var __fullPath = (sandbox.__basePath != "" ? sandbox.__basePath + "/" : "") + t;
-      var parsedTemplate = sandbox.__includeTemplate(__fullPath);
+      var __fullPath = t;
+      if(sandbox.__basePath != "" && t.indexOf("/") != 0 ){
+        __fullPath = sandbox.__basePath + "/" + t
+      }
+      sandbox.__includeTemplate(__fullPath);
     };
 
     sandbox.__eval = function (s, basepath) {
@@ -301,13 +307,13 @@ vimlet.meta = vimlet.meta || {};
 
       // Replace template with evalMatches
       result = t.replace(vimlet.meta.__regex, function (match) {
-        endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);        
-        match = vimlet.meta.__cleanMatch(match);        
-        var basePath = options ? options.basePath ? options.basePath : vimlet.meta.__getBasePath(templatePath) : vimlet.meta.__getBasePath(templatePath);        
+        endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);
+        match = vimlet.meta.__cleanMatch(match);
+        var basePath = options ? options.basePath ? options.basePath : vimlet.meta.__getBasePath(templatePath) : vimlet.meta.__getBasePath(templatePath);
         var res = sandbox.__eval(match, basePath);
-        if(res){
+        if (res) {
           return res + endOfLine;
-        }else{
+        } else {
           return res;
         }
       });
@@ -331,7 +337,7 @@ vimlet.meta = vimlet.meta || {};
     };
 
     sandbox.__includeTemplate = function (templatePath) {
-      // Get file must be synchronous
+      // Get file must be synchronous      
       var tContent = vimlet.meta.__getFile(templatePath);
       // Call template parser with wrapped in tags since its code that must run inside sandboxed scope
       return sandbox.__parse(vimlet.meta.tags[0] + " " + tContent + " " + vimlet.meta.tags[1], templatePath);
@@ -366,16 +372,15 @@ vimlet.meta = vimlet.meta || {};
   vimlet.meta.__getBasePath = function (f) {
     // Replace Windows separators
     var standarPath = f.replace(/\\/g, "/");
-    var path = standarPath.split("/");
-
     var base = "";
 
     if (standarPath.indexOf("/") > -1) {
+      var path = standarPath.split("/");
+
       // Remove last part of the path
       for (var i = 0; i < path.length - 1; i++) {
         base += "/" + path[i];
       }
-
       // Remove first /
       base = base.substring(1, base.length);
     }
@@ -420,12 +425,12 @@ vimlet.meta = vimlet.meta || {};
     // Remove start spaces with regex since trimLeft is not IE compatible
     match = match.replace(/^\s+/, "");
     var endOfLine = "";
-      // Determine match end of line
-      var endsWithNewLine = match.match(new RegExp("(\\r\\n$|\\r$|\\n$)", "g"));
+    // Determine match end of line
+    var endsWithNewLine = match.match(new RegExp("(\\r\\n$|\\r$|\\n$)", "g"));
 
-      if (endsWithNewLine) {
-        endOfLine = endsWithNewLine[0];
-      }
+    if (endsWithNewLine) {
+      endOfLine = endsWithNewLine[0];
+    }
     return endOfLine;
   };
 

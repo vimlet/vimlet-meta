@@ -58,7 +58,9 @@ module.exports.__evalProvider = function (s, sandbox) {
 // Override fileProvider for node
 module.exports.__fileProvider = function (filePath, callback) {
   var fixedPath = filePath;
-  if (!path.isAbsolute(filePath)) {
+  if (filePath.indexOf("/") === 0) {
+    fixedPath = path.join(cwd, filePath);
+  } else if (!path.isAbsolute(filePath)) {
     fixedPath = "./" + filePath;
   }
   if (callback) {
@@ -85,6 +87,7 @@ module.exports.__fileProvider = function (filePath, callback) {
   }
 };
 
+
 // Function overloading and node standard(error, data) callbacks 
 var baseParse = module.exports.parse;
 var baseParseTemplate = module.exports.parseTemplate;
@@ -110,22 +113,12 @@ function convertToNodeCallback(fn) {
 
 
 var parseConverted = convertToNodeCallback(baseParse);
-module.exports.parse = function() {
+module.exports.parse = function () {
   parseConverted.apply(null, arguments);
 }
 
-// @function parse (public) [Parse a template and return the result] @param template @param data @param callback
-// module.exports.parse = function () {
-//   convertToNodeCallback(baseParse).apply(null, arguments);
-// };
-
-
-// module.exports.parseTemplate = function () {
-//   convertToNodeCallback(baseParseTemplate).apply(null, arguments);
-// };
-
 var parseTemplateConverted = convertToNodeCallback(baseParseTemplate);
-module.exports.parseTemplate = function() {
+module.exports.parseTemplate = function () {
   parseTemplateConverted.apply(null, arguments);
 }
 
