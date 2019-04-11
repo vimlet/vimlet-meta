@@ -1,0 +1,2 @@
+I'm template3
+<% template("template4.vmi") %>

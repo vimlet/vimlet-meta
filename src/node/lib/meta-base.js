@@ -43,7 +43,7 @@ vimlet.meta = vimlet.meta || {};
     vimlet.meta.__setTags();
     var __sandbox = vimlet.meta.__createSandbox(options.scope);
     __sandbox.data = options.data || {};
-    var result = __sandbox.__parse(text);
+    var result = __sandbox.__parse(text, null, options);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(result);
   };
@@ -287,7 +287,7 @@ vimlet.meta = vimlet.meta || {};
       return sandbox.__output;
     };
 
-    sandbox.__parse = function (t, templatePath) {
+    sandbox.__parse = function (t, templatePath, options) {
       var result = "";
 
       if (vimlet.meta.parseCommented) {
@@ -304,8 +304,9 @@ vimlet.meta = vimlet.meta || {};
       // Replace template with evalMatches
       result = t.replace(vimlet.meta.__regex, function (match) {
         endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);        
-        match = vimlet.meta.__cleanMatch(match);
-        var res = sandbox.__eval(match, vimlet.meta.__getBasePath(templatePath));
+        match = vimlet.meta.__cleanMatch(match);        
+        var basePath = options ? options.basePath ? options.basePath : vimlet.meta.__getBasePath(templatePath) : vimlet.meta.__getBasePath(templatePath);        
+        var res = sandbox.__eval(match, basePath);
         if(res){
           return res + endOfLine;
         }else{

@@ -107,15 +107,27 @@ function convertToNodeCallback(fn) {
     }
   };
 }
+
+
+var parseConverted = convertToNodeCallback(baseParse);
+module.exports.parse = function() {
+  parseConverted.apply(null, arguments);
+}
+
 // @function parse (public) [Parse a template and return the result] @param template @param data @param callback
-module.exports.parse = function () {
-  convertToNodeCallback(baseParse).apply(null, arguments);
-};
+// module.exports.parse = function () {
+//   convertToNodeCallback(baseParse).apply(null, arguments);
+// };
 
-module.exports.parseTemplate = function () {
-  convertToNodeCallback(baseParseTemplate).apply(null, arguments);
-};
 
+// module.exports.parseTemplate = function () {
+//   convertToNodeCallback(baseParseTemplate).apply(null, arguments);
+// };
+
+var parseTemplateConverted = convertToNodeCallback(baseParseTemplate);
+module.exports.parseTemplate = function() {
+  parseTemplateConverted.apply(null, arguments);
+}
 
 // Node engine specific functions
 // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback

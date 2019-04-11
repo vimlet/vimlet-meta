@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="vmeta.js"></script>
+</head>
+
+<body>
+    <script>
+        var str1 = 'This is meta';
+        var str2 = 'This is meta <% template("resources/template2.vmi"); %>';
+        var str3 =
+            "This is meta <% template('template2.vmi'); %> Next  <% template('within/template3.vmi'); %>";
+        vimlet.meta.parse(str1, null, function (data) {
+            console.log(data);
+        });
+        vimlet.meta.parse(str2, null, function (data) {
+            console.log(data);
+        });
+        vimlet.meta.parse(str3, {basePath:"resources"}, function (data) {
+            console.log(data);
+        });
+    </script>
+</body>
+
+</html>
