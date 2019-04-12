@@ -1,0 +1,14 @@
+Hola <% 
+echo("Richard");
+echo(" Happy B-day!");
+%>
+
+Hello i'm result <%= "AWESOME!" %>
+
+<% 
+template("template1.vmi"); 
+echo("\n\n");
+template("template5.vmi"); 
+%>
+
+This is an echo test <%= "AWESOME!" %> <%= "YEP!" %>

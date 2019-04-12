@@ -1,0 +1,4 @@
+--- Start template1
+<% template("template2.vmi"); %>
+<% template("template3.vmi"); %>
+--- End template1
