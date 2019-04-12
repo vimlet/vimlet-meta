@@ -14,13 +14,17 @@
     "node": {
       "environments+": ["node"]
     },
-
+    
     "browser": {
       "plugins": ["tests/intern-plugin.js"],
       "environments+": [{ "browserName": "chrome", "fixSessionCapabilities": false }]
     },
+    
+    "ci": {
+      "extends": ["node"]
+    },
 
-    "all": {
+    "dev": {
       "extends": ["node", "browser"]
     }    
   }
