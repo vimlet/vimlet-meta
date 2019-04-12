@@ -7,11 +7,12 @@
     "vimlet-meta": "src/node/index.js"
   },
   "scripts": {
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "test": "npx intern config=@node"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/vimlet/vimlet-meta"
+    "type": "git",
+    "url": "https://github.com/vimlet/vimlet-meta"
   },
   "author": "",
   "license": "MIT",
@@ -23,5 +24,9 @@
     "mkdirp": "0.5.1",
     "glob-watcher": "5.0.3",
     "deasync": "0.1.14"
+  },
+  "devDependencies": {
+    "intern": "4.4.2",
+    "express": "4.16.4"
   }
 }
