@@ -2,6 +2,8 @@
 <img src='https://vimlet.com/resources/img/Meta-txt.png' title='Vimlet Meta' alt='Vimlet Meta' height="150">
 </p>
 
+[![Build Status](https://travis-ci.org/vimlet/vimlet-meta.svg?branch=master)](https://travis-ci.org/vimlet/vimlet-meta)
+
 It is a tool that generate files from templates.
 
 ## Features
