@@ -288,6 +288,7 @@ vimlet.meta = vimlet.meta || {};
       sandbox.__output = "";
       sandbox.__basePath = basepath;
 
+      s = s.replace(/\\/g, "\\\\"); // Fix \u which raise an error at eval for wrong unicode      
       vimlet.meta.__evalProvider(s, sandbox);
 
       return sandbox.__output;

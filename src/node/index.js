@@ -56,9 +56,8 @@ module.exports.__evalProvider = function (s, sandbox) {
 };
 
 // Override fileProvider for node
-module.exports.__fileProvider = function (filePath, callback) {
-  var fixedPath = path.isAbsolute(filePath) ? path.join(cwd, filePath) : path.join("./", filePath);
-
+module.exports.__fileProvider = function (filePath, callback) {  
+  var fixedPath = filePath.indexOf("/") === 0 ? path.join(cwd, filePath) : path.join("./", filePath);  
   if (callback) {
     // Must be asynchronous
     fs.readFile(fixedPath, "utf8", function (error, buf) {
