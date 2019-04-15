@@ -5,6 +5,7 @@
 
 ![npm](https://img.shields.io/npm/v/@vimlet/meta.svg)
 ![Travis (.org) branch](https://img.shields.io/travis/vimlet/vimlet-meta/master.svg)
+![Codacy grade](https://img.shields.io/codacy/grade/d7569552acb2411882cbd07db4b6e092.svg)
 ![GitHub](https://img.shields.io/github/license/vimlet/vimlet-meta.svg)
 
 It is a tool that generate files from templates.
