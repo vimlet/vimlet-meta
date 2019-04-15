@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vmeta.js"></script>
+</head>
+
+<body>
+    Meta. Browser mode.
+    <script>
+        var str1 = 'This is meta';
+        var str2 = 'This is meta <% template("resources/template2.vmi"); %>';
+        var str3 =
+            "This is meta <% template('template2.vmi'); %> Next  <% template('within/template3.vmi'); %>";
+
+            function parse(callback) {
+            vimlet.meta.parse(str1, null, function (data) {
+                callback(data);
+            });
+        }
+
+        function parseTemplate(callback) {
+            vimlet.meta.parseTemplate("resources/template2.vmi", null, function (data) {
+                callback(data);
+            });
+        }
+
+        function parseIncludeTemplate(callback) {
+            vimlet.meta.parse(str2, null, function (data) {
+                callback(data);
+            });
+        }
+
+        function parseIncludeTemplatePathToRoot(callback) {
+            vimlet.meta.parse(str3, {
+                basePath: "resources"
+            }, function (data) {
+                callback(data);
+            });
+        }
+    </script>
+</body>
+
+</html>

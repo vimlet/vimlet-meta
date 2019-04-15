@@ -56,8 +56,8 @@ module.exports.__evalProvider = function (s, sandbox) {
 };
 
 // Override fileProvider for node
-module.exports.__fileProvider = function (filePath, callback) {  
-  var fixedPath = filePath.indexOf("/") === 0 ? path.join(cwd, filePath) : path.join("./", filePath);  
+module.exports.__fileProvider = function (filePath, callback) {
+  var fixedPath = filePath.indexOf("/") === 0 ? path.join(cwd, filePath) : path.join("./", filePath);
   if (callback) {
     // Must be asynchronous
     fs.readFile(fixedPath, "utf8", function (error, buf) {
@@ -135,10 +135,10 @@ module.exports.parseTemplateGlob = async function (include, options, callback) {
 };
 
 // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
-module.exports.parseTemplateGlobAndWrite = function (include, output, options, callback) {
+module.exports.parseTemplateGlobAndWrite = async function (include, output, options, callback) {
   options = options || {};
-  if (options.clean) {
-    fs.removeSync(output);
+  if (options.clean) {    
+    await io.deleteFolderRecursive(output);
   }
   module.exports.parseTemplateGlob(include, options, function (error, data) {
     if (error) {
@@ -147,14 +147,16 @@ module.exports.parseTemplateGlobAndWrite = function (include, output, options, c
       if (data && output) {
         // Write data to output without .vmt extension
         var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
-        fs.mkdirsSync(path.dirname(fileOutput));
-        fs.writeFileSync(fileOutput, data.result);
+        fs.mkdirs(path.dirname(fileOutput), function () {
+          fs.writeFile(fileOutput, data.result, function () {
+            if (callback) {
+              callback();
+            }
+          });
+        });
       }
     }
   });
-  if (callback) {
-    callback();
-  }
 };
 
 
@@ -174,6 +176,8 @@ module.exports.parseTemplateGlobAndWriteSync = function (include, output, option
 
 // @function watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder, watchdirectory:watch directories for changes and compile watch files] @param callback
 module.exports.watch = function (include, output, options) {
+  var watcher = [];
+  options = options || {};
   var optionsCopy = JSON.parse(JSON.stringify(options));
   if (options.data && typeof options.data != "object") {
     var currentPath = options.data;
@@ -185,9 +189,9 @@ module.exports.watch = function (include, output, options) {
     }
   }
   module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
-  watch.watch(include, output, options);
+  watcher.push(watch.watch(include, output, options));
   if (options && options.watchdirectory) {
-    watch.watchDirectory(options.watchdirectory, options.exclude, function () {
+    watcher.push(watch.watchDirectory(options.watchdirectory, options.exclude, function () {
       var optionsCopy = JSON.parse(JSON.stringify(options));
       if (options.data && typeof options.data != "object") {
         var currentPath = options.data;
@@ -207,8 +211,9 @@ module.exports.watch = function (include, output, options) {
       } else {
         module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
       }
-    });
+    }));
   }
+  return watcher;
 };
 
 
@@ -261,6 +266,7 @@ if (!module.parent) {
   options.exclude = exclude;
   options.data = data;
   options.clean = clean;
+  
 
   if (cli.result.help) {
     cli.printHelp();

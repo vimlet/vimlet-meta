@@ -27,6 +27,7 @@
     "deasync": "0.1.14"
   },
   "devDependencies": {
+    "@vimlet/commons-run": "0.0.9",
     "intern": "4.4.2",
     "express": "4.16.4"
   }

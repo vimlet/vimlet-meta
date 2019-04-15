@@ -66,6 +66,7 @@ exports.watch = function (include, output, options) {
       broadcastErr(error);
     }
   });
+  return watcher;
 };
 
 exports.watchDirectory = function (include, exclude, callback) {
@@ -108,4 +109,5 @@ exports.watchDirectory = function (include, exclude, callback) {
       broadcastErr(error);
     }
   });
+  return watcher;
 };

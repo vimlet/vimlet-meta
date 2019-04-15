@@ -1,2 +1,2 @@
 I'm template4
-<% template("/resources/template5.vmi") %>
+<% template("/tests/unit/node/resources/template5.vmi") %>

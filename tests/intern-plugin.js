@@ -7,6 +7,10 @@ var serverHttp;
 
 intern.on("beforeRun", () => {
   return new Promise(resolve => {
+
+    // Next script will run meta build
+    require("../scripts/build.js");
+
     // Default config
     var port = 3000;
     var staticPath = path.join(__dirname, "webapp");
