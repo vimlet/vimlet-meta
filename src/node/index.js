@@ -57,7 +57,14 @@ module.exports.__evalProvider = function (s, sandbox) {
 
 // Override fileProvider for node
 module.exports.__fileProvider = function (filePath, callback) {
-  var fixedPath = filePath.indexOf("/") === 0 ? path.join(cwd, filePath) : path.join("./", filePath);
+  var fixedPath = filePath;
+  if (filePath.indexOf("/") === 0) {  // /path means that current path start from working directory
+    if (filePath.indexOf(cwd) < 0) {  // Avoid linux absolute path issue starting by /
+      fixedPath = path.join(cwd, filePath);
+    }
+  } else {
+    fixedPath = path.join("./", filePath);
+  }
   if (callback) {
     // Must be asynchronous
     fs.readFile(fixedPath, "utf8", function (error, buf) {
