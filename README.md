@@ -1,5 +1,5 @@
-<p align='center'>
-<img src='https://vimlet.com/resources/img/Meta-txt.png' title='Vimlet Meta' alt='Vimlet Meta' height="150">
+<p align="center">
+<img src="https://vimlet.com/resources/img/Meta-txt.png" title="Vimlet Meta" alt="Vimlet Meta" height="150">
 </p>
 
 
