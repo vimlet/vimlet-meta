@@ -107,7 +107,7 @@ function convertToNodeCallback(fn) {
         callback(null, data);
       }
       fn.apply(null, arguments);
-    } catch (error) {
+    } catch (error) {      
       callback(error);
     }
   };
@@ -120,7 +120,7 @@ module.exports.parse = function () {
 }
 
 var parseTemplateConverted = convertToNodeCallback(baseParseTemplate);
-module.exports.parseTemplate = function () {
+module.exports.parseTemplate = function () {  
   parseTemplateConverted.apply(null, arguments);
 }
 

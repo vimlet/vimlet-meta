@@ -16,10 +16,12 @@ suite("parseTemplate", () => {
                 "The expected output is: 'I am a template without includes'");
         });
     });
-    test("parseTemplateInclude", () => {
+    test("parseTemplateInclude", () => {        
         meta.parseTemplate(path.join(__dirname, "resources/template1.vmi"), null, function (error, data) {                      
-            assert.strictEqual(data, '--- Start template1\r\nI am template2\r\nI\'m template3\r\nI\'m template4\r\n--- End template1',
-                "The expected output is: '--- Start template1\r\nI am template2\r\nI\'m template3\r\nI\'m template4\r\n--- End template1'");
+            var result = data.replace(/(\r\n|\n|\r)/gm,"_&_"); 
+            var expected = "--- Start template1_&_I am template2_&_I'm template3_&_I'm template4_&_--- End template1";
+            assert.strictEqual(result, expected,
+                "The expected output is: " + expected);
         });
     });
 });
