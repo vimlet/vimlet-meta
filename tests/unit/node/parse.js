@@ -28,4 +28,7 @@ suite("parse", () => {
                 "The expected output is: " + expected);
         });
     });
+    test("fail", () => {
+        assert.strictEqual(true, false, "This will always fail");
+    });
 });
