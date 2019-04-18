@@ -10,3 +10,6 @@ install:
 script:
 - npm run build
 - npm run test
+notifications:
+  webhooks:
+    - https://static.vimlet.com:8443/travis
