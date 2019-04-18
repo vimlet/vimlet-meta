@@ -30,5 +30,6 @@ suite("parse", () => {
     });
     test("fail", () => {
         assert.strictEqual(true, false, "This will always fail");
+        
     });
 });
