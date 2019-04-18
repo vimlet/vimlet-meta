@@ -2,7 +2,6 @@
 <img src="https://vimlet.com/resources/img/Meta-txt.png" title="Vimlet Meta" alt="Vimlet Meta" height="150">
 </p>
 
-
 ![npm](https://img.shields.io/npm/v/@vimlet/meta.svg)
 ![Travis (.org) branch](https://img.shields.io/travis/vimlet/vimlet-meta/master.svg)
 ![Codacy grade](https://img.shields.io/codacy/grade/d7569552acb2411882cbd07db4b6e092.svg)
