@@ -142,4 +142,3 @@ Note that meta respect file extension if it is included in template name:
 
 ## License
 vComet is released under MIT License. See [LICENSE](https://github.com/vimlet/vimlet-meta/blob/master/LICENSE) for details.
-
