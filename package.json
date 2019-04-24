@@ -24,8 +24,7 @@
     "js-yaml": "3.13.1",
     "mkdirp": "0.5.1",
     "glob-watcher": "5.0.3",
-    "deasync": "0.1.14",
-    "@vimlet/commons-watcher": "0.0.1"
+    "deasync": "0.1.14"
   },
   "devDependencies": {
     "@vimlet/commons-run": "0.0.9",
