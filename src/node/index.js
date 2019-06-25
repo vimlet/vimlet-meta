@@ -58,8 +58,8 @@ module.exports.__evalProvider = function (s, sandbox) {
 // Override fileProvider for node
 module.exports.__fileProvider = function (filePath, callback) {
   var fixedPath = filePath;
-  if (filePath.indexOf("/") === 0) {  // /path means that current path start from working directory
-    if (filePath.indexOf(cwd) < 0) {  // Avoid linux absolute path issue starting by /
+  if (filePath.indexOf("/") === 0) { // /path means that current path start from working directory
+    if (filePath.indexOf(cwd) < 0) { // Avoid linux absolute path issue starting by /
       fixedPath = path.join(cwd, filePath);
     }
   } else {
@@ -94,43 +94,54 @@ module.exports.__fileProvider = function (filePath, callback) {
 var baseParse = module.exports.parse;
 var baseParseTemplate = module.exports.parseTemplate;
 
-// Converts any callback to a standard(error, data) callback
-// NOTE: Only single param callback is supported
-// NOTE: Callback must be the last param
-// @function (private) converToNodeCallback [Converts any callback to a standard(error, data) callback, only single param callback is supported.] @param fn
-function convertToNodeCallback(fn) {
-  return function () {
-    var lastArgPosition = arguments.length - 1;
-    var callback = arguments[lastArgPosition];
-    try {
-      arguments[lastArgPosition] = function (data) {
-        callback(null, data);
-      }
-      fn.apply(null, arguments);
-    } catch (error) {      
-      callback(error);
-    }
-  };
+module.exports.parse = function (text, options, callback) {  
+  if (!callback) {
+    return new Promise(function (resolve, reject) {
+      module.exports.parse(text, options, function (error, data) {
+        error ? reject(error) : resolve(data);
+      });
+    });
+  }
+  try {
+    baseParse(text, options, function(data){      
+      callback(null, data);
+    });
+  } catch (error) {
+    callback(error);
+  }
+}
+module.exports.parseTemplate = function (template, options, callback) {
+  if (!callback) {
+    return new Promise(function (resolve, reject) {
+      module.exports.parseTemplate(template, options, function (error, data) {
+        error ? reject(error) : resolve(data);
+      });
+    });
+  }
+  try {
+    baseParseTemplate(template, options, function(data){      
+      callback(null, data);
+    });
+  } catch (error) {
+    callback(error);
+  }
 }
 
-
-var parseConverted = convertToNodeCallback(baseParse);
-module.exports.parse = function () {
-  parseConverted.apply(null, arguments);
-}
-
-var parseTemplateConverted = convertToNodeCallback(baseParseTemplate);
-module.exports.parseTemplate = function () {  
-  parseTemplateConverted.apply(null, arguments);
-}
 
 // Node engine specific functions
 // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
-module.exports.parseTemplateGlob = async function (include, options, callback) {
+module.exports.parseTemplateGlob = async function (include, options, callback) {  
+  if (!callback) {
+    return new Promise(function (resolve, reject) {
+      module.exports.parseTemplateGlob(include, options, function (error, data) {
+        error ? reject(error) : resolve(data);
+      });
+    });
+  }
   options = options || {};
-  var rootsArray = await io.getFiles(include, options);
+  var rootsArray = await io.getFiles(include, options);  
   rootsArray.forEach(function (rootObject) {
-    rootObject.files.forEach(function (relativePath) {
+    rootObject.files.forEach(function (relativePath) {      
       module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
         callback(error, {
           relativePath: relativePath,
@@ -142,25 +153,35 @@ module.exports.parseTemplateGlob = async function (include, options, callback) {
 };
 
 // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
-module.exports.parseTemplateGlobAndWrite = async function (include, output, options, callback) {
-  options = options || {};
-  if (options.clean) {    
-    await io.deleteFolderRecursive(output);
+module.exports.parseTemplateGlobAndWrite = async function (include, output, options, callback) {  
+  if (!callback) {    
+    return new Promise(function (resolve, reject) {
+      module.exports.parseTemplateGlobAndWrite(include, output, options, function (error) {        
+        error ? reject(error) : resolve();
+      });
+    });
   }
-  module.exports.parseTemplateGlob(include, options, function (error, data) {
+  options = options || {};
+  if (options.clean) {
+    await io.deleteFolderRecursive(output);
+  }  
+  module.exports.parseTemplateGlob(include, options, function (error, data) {    
     if (error) {
       console.error(error);
-    } else {
+      callback(error);
+    } else {      
       if (data && output) {
         // Write data to output without .vmt extension
         var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
         fs.mkdirs(path.dirname(fileOutput), function () {
           fs.writeFile(fileOutput, data.result, function () {
-            if (callback) {
-              callback();
-            }
+            callback();
           });
         });
+      }else if(!data){
+        callback(new Error("notFound"));
+      }else {
+        callback(new Error("syntaxError"));
       }
     }
   });
@@ -273,7 +294,7 @@ if (!module.parent) {
   options.exclude = exclude;
   options.data = data;
   options.clean = clean;
-  
+
 
   if (cli.result.help) {
     cli.printHelp();
