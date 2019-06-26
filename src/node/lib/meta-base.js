@@ -41,7 +41,7 @@ vimlet.meta = vimlet.meta || {};
           error ? reject(error) : resolve(data);
         });
       });
-    }
+    } 
     options = options || {};
     if (vimlet.meta.decodeHTML) {
       text = vimlet.meta.__decodeHTMLEntities(text);

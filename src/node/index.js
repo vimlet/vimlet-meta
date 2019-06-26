@@ -100,7 +100,7 @@ module.exports.parse = function (text, options, callback) {
 
 module.exports.parseTemplate = function (template, options, callback) {
   return baseParseTemplate(template, options, callback);
-}
+} 
 
 
 // Node engine specific functions
