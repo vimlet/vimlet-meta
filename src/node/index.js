@@ -94,37 +94,12 @@ module.exports.__fileProvider = function (filePath, callback) {
 var baseParse = module.exports.parse;
 var baseParseTemplate = module.exports.parseTemplate;
 
-module.exports.parse = function (text, options, callback) {  
-  if (!callback) {
-    return new Promise(function (resolve, reject) {
-      module.exports.parse(text, options, function (error, data) {
-        error ? reject(error) : resolve(data);
-      });
-    });
-  }
-  try {
-    baseParse(text, options, function(data){      
-      callback(null, data);
-    });
-  } catch (error) {
-    callback(error);
-  }
+module.exports.parse = function (text, options, callback) { 
+  return baseParse(text, options, callback); 
 }
+
 module.exports.parseTemplate = function (template, options, callback) {
-  if (!callback) {
-    return new Promise(function (resolve, reject) {
-      module.exports.parseTemplate(template, options, function (error, data) {
-        error ? reject(error) : resolve(data);
-      });
-    });
-  }
-  try {
-    baseParseTemplate(template, options, function(data){      
-      callback(null, data);
-    });
-  } catch (error) {
-    callback(error);
-  }
+  return baseParseTemplate(template, options, callback);
 }
 
 

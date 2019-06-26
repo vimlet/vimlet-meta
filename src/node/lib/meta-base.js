@@ -35,6 +35,13 @@ vimlet.meta = vimlet.meta || {};
   vimlet.meta.__decodeEntityRegex = /&(?:#x[a-f0-9]+|#[0-9]+|[a-z0-9]+);?/ig;
 
   vimlet.meta.parse = function (text, options, callback) {
+    if (!callback) {
+      return new Promise(function (resolve, reject) {
+        vimlet.meta.parse(text, options, function (error, data) {
+          error ? reject(error) : resolve(data);
+        });
+      });
+    }
     options = options || {};
     if (vimlet.meta.decodeHTML) {
       text = vimlet.meta.__decodeHTMLEntities(text);
@@ -45,17 +52,24 @@ vimlet.meta = vimlet.meta || {};
     __sandbox.data = options.data || {};
     var result = __sandbox.__parse(text, null, options);
     vimlet.meta.__destroySandbox(__sandbox);
-    callback(result);
+    callback(null, result);
   };
 
   vimlet.meta.parseTemplate = function (template, options, callback) {
+    if (!callback) {
+      return new Promise(function (resolve, reject) {
+        vimlet.meta.parseTemplate(template, options, function (error, data) {
+          error ? reject(error) : resolve(data);
+        });
+      });
+    }
     options = options || {};
     vimlet.meta.__setTags();
     var __sandbox = vimlet.meta.__createSandbox(options.scope);
     __sandbox.data = options.data || {};
     var result = __sandbox.__parseTemplate(template);
     vimlet.meta.__destroySandbox(__sandbox);
-    callback(result);
+    callback(null, result);
   };
 
   // Decode html entities
@@ -268,7 +282,7 @@ vimlet.meta = vimlet.meta || {};
 
     sandbox.template = function (t) {
       var __fullPath = t;
-      if(sandbox.__basePath != "" && t.indexOf("/") != 0 ){
+      if (sandbox.__basePath != "" && t.indexOf("/") != 0) {
         __fullPath = sandbox.__basePath + "/" + t
       }
       var storedOutput = sandbox.__output;
@@ -278,7 +292,7 @@ vimlet.meta = vimlet.meta || {};
 
     sandbox.include = function (t) {
       var __fullPath = t;
-      if(sandbox.__basePath != "" && t.indexOf("/") != 0 ){
+      if (sandbox.__basePath != "" && t.indexOf("/") != 0) {
         __fullPath = sandbox.__basePath + "/" + t
       }
       sandbox.__includeTemplate(__fullPath);
