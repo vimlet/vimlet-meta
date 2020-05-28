@@ -134,7 +134,7 @@ Hello Peter
 
 We use .vmt for vimlet meta templates and .vmi for vimlet meta imported in our imported templates but any extension is welcome.
 
-Note that meta respect file extension if it is included in template name:
+Note that meta respects file extension if it is included in template name:
 * index.html.vmt after parsed will be written as index.html.
 
 

@@ -1,9 +1,9 @@
 var meta = require("../../../src/node");
-var commons = require("@vimlet/commons");
 
 
 var scope = null;
-var include = "resources/hello.txt.vmt";
+var include = "resources/*.vmt";
+var wrongInclude = "resources1/*.vmt";
 var exclude = null;
 var data = null;
 var callback = function(err,data){
@@ -12,4 +12,5 @@ var callback = function(err,data){
 };
 
 
-meta.parseTemplateGlob(include, null, callback);
+// meta.parseTemplateGlob(include, null, callback);
+meta.parseTemplateGlob(wrongInclude, null, callback);

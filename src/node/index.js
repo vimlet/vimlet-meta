@@ -7,7 +7,6 @@ var glob = require("glob");
 var fs = require("fs-extra");
 var cli = require("@vimlet/cli").instantiate();
 var watch = require("./lib/watch");
-var deasync = require("deasync");
 var cwd = process.cwd();
 
 // Node require
@@ -94,18 +93,18 @@ module.exports.__fileProvider = function (filePath, callback) {
 var baseParse = module.exports.parse;
 var baseParseTemplate = module.exports.parseTemplate;
 
-module.exports.parse = function (text, options, callback) { 
-  return baseParse(text, options, callback); 
+module.exports.parse = function (text, options, callback) {
+  return baseParse(text, options, callback);
 }
 
 module.exports.parseTemplate = function (template, options, callback) {
   return baseParseTemplate(template, options, callback);
-} 
+}
 
 
 // Node engine specific functions
 // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
-module.exports.parseTemplateGlob = async function (include, options, callback) {  
+module.exports.parseTemplateGlob = async function (include, options, callback) {
   if (!callback) {
     return new Promise(function (resolve, reject) {
       module.exports.parseTemplateGlob(include, options, function (error, data) {
@@ -114,9 +113,11 @@ module.exports.parseTemplateGlob = async function (include, options, callback) {
     });
   }
   options = options || {};
-  var rootsArray = await io.getFiles(include, options);  
+  var rootsArray = await io.getFiles(include, options);
+  var empty = true;
   rootsArray.forEach(function (rootObject) {
-    rootObject.files.forEach(function (relativePath) {      
+    rootObject.files.forEach(function (relativePath) {
+      empty = false;
       module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
         callback(error, {
           relativePath: relativePath,
@@ -125,13 +126,16 @@ module.exports.parseTemplateGlob = async function (include, options, callback) {
       });
     });
   });
+  if (empty) {
+    callback(new Error("No files"));
+  }
 };
 
 // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
-module.exports.parseTemplateGlobAndWrite = async function (include, output, options, callback) {  
-  if (!callback) {    
+module.exports.parseTemplateGlobAndWrite = async function (include, output, options, callback) {
+  if (!callback) {
     return new Promise(function (resolve, reject) {
-      module.exports.parseTemplateGlobAndWrite(include, output, options, function (error) {        
+      module.exports.parseTemplateGlobAndWrite(include, output, options, function (error) {
         error ? reject(error) : resolve();
       });
     });
@@ -139,42 +143,82 @@ module.exports.parseTemplateGlobAndWrite = async function (include, output, opti
   options = options || {};
   if (options.clean) {
     await io.deleteFolderRecursive(output);
-  }  
-  module.exports.parseTemplateGlob(include, options, function (error, data) {    
+  }
+  module.exports.parseTemplateGlob(include, options, function (error, data) {
     if (error) {
-      console.error(error);
       callback(error);
-    } else {      
+    } else {
       if (data && output) {
         // Write data to output without .vmt extension
         var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
         fs.mkdirs(path.dirname(fileOutput), function () {
           fs.writeFile(fileOutput, data.result, function () {
+            if (!("log" in options) || options.log) {
+              console.log("->", fileOutput);
+            }
             callback();
           });
         });
-      }else if(!data){
+      } else if (!data) {
         callback(new Error("notFound"));
-      }else {
+      } else {
         callback(new Error("syntaxError"));
       }
     }
   });
 };
 
-
-// @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
-module.exports.parseTemplateGlobAndWriteSync = function (include, output, options) {
-  var done = false;
-  var data;
-  module.exports.parseTemplateGlobAndWrite(include, output, options, function cb(res) {
-    data = res;
-    done = true;
-  });
-  deasync.loopWhile(function () {
-    return !done;
+// @function parseTemplateGlobAndWriteSync (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
+module.exports.parseTemplateGlobAndWriteSync = async function (include, output, options) {
+  options = options || {};
+  if (options.clean) {
+    io.deleteFolderRecursiveSync(output);
+  }
+  await module.exports.parseTemplateGlob(include, options, function (error, data) {
+    if (error) {
+      throw error;
+    } else {
+      if (data && output) {
+        // Write data to output without .vmt extension
+        var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
+        fs.mkdirsSync(path.dirname(fileOutput));
+        fs.writeFileSync(fileOutput, data.result);
+        if (!("log" in options) || options.log) {
+          console.log("->", fileOutput);
+        }
+      } else if (!data) {
+        throw new Error("notFound");
+      } else {
+        throw new Error("syntaxError");
+      }
+    }
   });
 };
+
+
+// // @function parseTemplateGlobAndWriteSync (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
+// module.exports.parseTemplateGlobAndWriteSync = async function (include, output, options) {
+//   options = options || {};
+//   if (options.clean) {
+//     await io.deleteFolderRecursive(output);
+//   }
+//   var data = await module.exports.parseTemplateGlob(include, options);
+//   if (data && output) {
+//     // Write data to output without .vmt extension
+//     var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
+//     fs.mkdirsSync(path.dirname(fileOutput));
+//     fs.writeFileSync(fileOutput, data.result);
+//     if (!("log" in options) || options.log) {
+//       console.log("->", fileOutput);
+//     }
+//   } else if (!data) {
+//     throw new Error("notFound");
+//   } else {
+//     throw new Error("syntaxError");
+//   }
+//   console.log("FINISH");
+
+// };
 
 
 // @function watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder, watchdirectory:watch directories for changes and compile watch files] @param callback
@@ -237,6 +281,7 @@ if (!module.parent) {
     .value("-o", "--output", "Output path")
     .value("-d", "--data", "Json file path")
     .flag("-c", "--clean", "Clean output directory")
+    .flag("-nl", "--nolog", "Prevent console from printing logs")
     .flag("-p", "--preventCommented", "Prevent removal of wrapped templates")
     .value("-w", "--watch", "Keeps watching for changes")
     .flag("-h", "--help", "Shows help")
@@ -263,12 +308,13 @@ if (!module.parent) {
   var data = readData || {};
   var output = cli.result.output || cwd;
   var clean = cli.result.clean || false;
-
+  var log = cli.result.nolog ? !cli.result.nolog : true;
 
   var options = {};
   options.exclude = exclude;
   options.data = data;
   options.clean = clean;
+  options.log = log;
 
 
   if (cli.result.help) {

@@ -1,5 +1,4 @@
 var meta = require("../../../src/node");
-var commons = require("@vimlet/commons");
 
 
 var scope = null;
@@ -14,5 +13,11 @@ options.clean = true;
 
 console.log("PRE");
 
-meta.parseTemplateGlobAndWriteSync(include, output, options);
+// meta.parseTemplateGlobAndWriteSync(include, output, options);
+
+async function all() {
+  await meta.parseTemplateGlobAndWriteSync(include, output, options);
+  console.log("END");
+}
+all();
 console.log("DONE");

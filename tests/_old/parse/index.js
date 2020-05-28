@@ -13,9 +13,10 @@ var template1 = "Hello i'm a template! <% template('template2.vmi'); %> Next  <%
 // }
 // parse();
 
-meta.parseTemplate(path.join(__dirname, "resources/template1.vmi"), null, function(error, data) {
-  console.log(data);
-});
+// meta.parseTemplate(path.join(__dirname, "resources/template1.vmi"), null, function(error, data) {
+//   console.log(data);
+// });
+
 async function parseTemplate() {
   var res = await meta.parseTemplate(path.join(__dirname, "resources/template1.vmi"));
   console.log(res);
@@ -33,6 +34,12 @@ async function parseTemplate() {
 // parseTemplateGlob();
 
 // meta.parseTemplateGlobAndWrite(path.join(__dirname, "**/*.vmt"), path.join(__dirname), null);
+// async function parseTemplateGlobAndWrite() {
+//   await meta.parseTemplateGlobAndWrite(path.join(__dirname, "**/*.vmt"), path.join(__dirname));
+// }
+// parseTemplateGlobAndWrite();
+
+meta.parseTemplateGlobAndWrite(path.join(__dirname, "**/*.vmt"), path.join(__dirname), null);
 // async function parseTemplateGlobAndWrite() {
 //   await meta.parseTemplateGlobAndWrite(path.join(__dirname, "**/*.vmt"), path.join(__dirname));
 // }

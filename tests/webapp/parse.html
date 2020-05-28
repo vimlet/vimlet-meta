@@ -18,19 +18,19 @@
             "This is meta <% template('template2.vmi'); %> Next  <% template('within/template3.vmi'); %>";
 
             function parse(callback) {
-            vimlet.meta.parse(str1, null, function (data) {
+            vimlet.meta.parse(str1, null, function (error, data) {                
                 callback(data);
             });
         }
 
         function parseTemplate(callback) {
-            vimlet.meta.parseTemplate("resources/template2.vmi", null, function (data) {
+            vimlet.meta.parseTemplate("resources/template2.vmi", null, function (error, data) {
                 callback(data);
             });
         }
 
         function parseIncludeTemplate(callback) {
-            vimlet.meta.parse(str2, null, function (data) {
+            vimlet.meta.parse(str2, null, function (error, data) {
                 callback(data);
             });
         }
@@ -38,7 +38,7 @@
         function parseIncludeTemplatePathToRoot(callback) {
             vimlet.meta.parse(str3, {
                 basePath: "resources"
-            }, function (data) {
+            }, function (error, data) {
                 callback(data);
             });
         }
