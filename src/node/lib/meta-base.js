@@ -41,7 +41,7 @@ vimlet.meta = vimlet.meta || {};
           error ? reject(error) : resolve(data);
         });
       });
-    } 
+    }
     options = options || {};
     if (vimlet.meta.decodeHTML) {
       text = vimlet.meta.__decodeHTMLEntities(text);
@@ -67,7 +67,7 @@ vimlet.meta = vimlet.meta || {};
     vimlet.meta.__setTags();
     var __sandbox = vimlet.meta.__createSandbox(options.scope);
     __sandbox.data = options.data || {};
-    var result = __sandbox.__parseTemplate(template);
+    var result = __sandbox.__parseTemplate(template, options);
     vimlet.meta.__destroySandbox(__sandbox);
     callback(null, result);
   };
@@ -298,11 +298,17 @@ vimlet.meta = vimlet.meta || {};
       sandbox.__includeTemplate(__fullPath);
     };
 
-    sandbox.__eval = function (s, basepath) {
+    sandbox.__eval = function (s, basepath, options) {
+
+      options = options || {};
+
       sandbox.__output = "";
       sandbox.__basePath = basepath;
 
-      s = s.replace(/\\/g, "\\\\"); // Fix \u which raise an error at eval for wrong unicode      
+      if (!("fixUnicode" in options) || options.fixUnicode) {
+        s = s.replace(/\\/g, "\\\\"); // Fix \u which raise an error at eval for wrong unicode          
+      }
+
       vimlet.meta.__evalProvider(s, sandbox);
 
       return sandbox.__output;
@@ -327,7 +333,7 @@ vimlet.meta = vimlet.meta || {};
         endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);
         match = vimlet.meta.__cleanMatch(match);
         var basePath = options ? options.basePath ? options.basePath : vimlet.meta.__getBasePath(templatePath) : vimlet.meta.__getBasePath(templatePath);
-        var res = sandbox.__eval(match, basePath);
+        var res = sandbox.__eval(match, basePath, options);
         if (res) {
           return res + endOfLine;
         } else {
@@ -346,11 +352,11 @@ vimlet.meta = vimlet.meta || {};
       return result;
     };
 
-    sandbox.__parseTemplate = function (templatePath) {
+    sandbox.__parseTemplate = function (templatePath, options) {
       // Get file must be synchronous
       var tContent = vimlet.meta.__getFile(templatePath);
       // Call template parser
-      return sandbox.__parse(tContent, templatePath);
+      return sandbox.__parse(tContent, templatePath, options);
     };
 
     sandbox.__includeTemplate = function (templatePath) {
