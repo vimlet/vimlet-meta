@@ -9,263 +9,237 @@ var cli = require("@vimlet/cli").instantiate();
 var watch = require("./lib/watch");
 var cwd = process.cwd();
 
-// Node require
-var require_fs;
-var require_vm;
 
-// Make base accessible from the required scope
-// @property meta [Access to meta]
-module.exports = require("./lib/meta-base").instance();
+module.exports.instance = function () {
+  // Node require
+  var require_vm;
 
-// Switch to node engine mode
-// @property engine [Engine to run (node|browser)]
-module.exports.engine = "node";
+  var instance = require("./lib/meta-base").instance();
 
-// Override sandboxProvider;
-module.exports.__sandboxProvider = function (sandbox) {
+  // Switch to node engine mode
+  // @property engine [Engine to run (node|browser)]
+  instance.engine = "node";
 
-  if (!require_vm) {
-    require_vm = require("vm");
-  }
+  // Override sandboxProvider;
+  instance.__sandboxProvider = function (sandbox) {
 
-  // Clone node global scope to baseContext
-  var baseContext = Object.assign({}, sandbox);
-
-  // Add other node global modules to baseContext
-
-  // exports
-  // require
-  // module
-  // __filename
-  // __dirname
-
-  baseContext.exports = exports;
-  baseContext.require = require;
-  baseContext.module = module;
-  baseContext.__filename = __filename;
-  baseContext.__dirname = __dirname;
-
-  return require_vm.createContext(baseContext);
-};
-
-// Override evalProvider for node
-module.exports.__evalProvider = function (s, sandbox) {
-  var script = new require_vm.Script(s);
-  script.runInContext(sandbox);
-};
-
-// Override fileProvider for node
-module.exports.__fileProvider = function (filePath, callback) {
-  var fixedPath = filePath;
-  if (filePath.indexOf("/") === 0) { // /path means that current path start from working directory
-    if (filePath.indexOf(cwd) < 0) { // Avoid linux absolute path issue starting by /
-      fixedPath = path.join(cwd, filePath);
+    if (!require_vm) {
+      require_vm = require("vm");
     }
-  } else {
-    fixedPath = path.join("./", filePath);
-  }
-  if (callback) {
-    // Must be asynchronous
-    fs.readFile(fixedPath, "utf8", function (error, buf) {
-      if (!error) {
-        callback(buf.toString());
-      }
-    });
-  } else {
-    // Must be synchronous    
-    try {
-      return fs.readFileSync(fixedPath, "utf8").toString();
-    } catch (error) {
-      if (error.path) {
-        console.log();
-        console.log("Error, file not found: ", error.path);
-        console.log();
-      } else {
-        console.log(error);
 
+    // Clone node global scope to baseContext
+    var baseContext = Object.assign({}, sandbox);
+
+    // Add other node global modules to baseContext
+    baseContext.exports = exports;
+    baseContext.require = require;
+    baseContext.module = module;
+    baseContext.__filename = __filename;
+    baseContext.__dirname = __dirname;
+
+    return require_vm.createContext(baseContext);
+  };
+
+  // Override evalProvider for node
+  instance.__evalProvider = function (s, sandbox) {
+    var script = new require_vm.Script(s);
+    script.runInContext(sandbox);
+  };
+
+  // Override fileProvider for node
+  instance.__fileProvider = function (filePath, callback) {
+    var fixedPath = filePath;
+    if (filePath.indexOf("/") === 0) { // /path means that current path start from working directory
+      if (filePath.indexOf(cwd) < 0) { // Avoid linux absolute path issue starting by /
+        fixedPath = path.join(cwd, filePath);
       }
+    } else {
+      fixedPath = path.join("./", filePath);
     }
-  }
-};
-
-
-// Function overloading and node standard(error, data) callbacks 
-var baseParse = module.exports.parse;
-var baseParseTemplate = module.exports.parseTemplate;
-
-module.exports.parse = function (text, options, callback) {
-  return baseParse(text, options, callback);
-}
-
-module.exports.parseTemplate = function (template, options, callback) {
-  return baseParseTemplate(template, options, callback);
-}
-
-
-// Node engine specific functions
-// @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
-module.exports.parseTemplateGlob = async function (include, options, callback) {
-  if (!callback) {
-    return new Promise(function (resolve, reject) {
-      module.exports.parseTemplateGlob(include, options, function (error, data) {
-        error ? reject(error) : resolve(data);
+    if (callback) {
+      // Must be asynchronous
+      fs.readFile(fixedPath, "utf8", function (error, buf) {
+        if (!error) {
+          callback(buf.toString());
+        }
       });
-    });
+    } else {
+      // Must be synchronous    
+      try {
+        return fs.readFileSync(fixedPath, "utf8").toString();
+      } catch (error) {
+        if (error.path) {
+          console.log();
+          console.log("Error, file not found: ", error.path);
+          console.log();
+        } else {
+          console.log(error);
+
+        }
+      }
+    }
+  };
+
+
+  // Function overloading and node standard(error, data) callbacks 
+  var baseParse = instance.parse;
+  var baseParseTemplate = instance.parseTemplate;
+
+  instance.parse = function (text, options, callback) {
+    return baseParse(text, options, callback);
   }
-  options = options || {};
-  var rootsArray = await io.getFiles(include, options);
-  var empty = true;
-  rootsArray.forEach(function (rootObject) {
-    rootObject.files.forEach(function (relativePath) {
-      empty = false;
-      module.exports.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
-        callback(error, {
-          relativePath: relativePath,
-          result: data
+
+  instance.parseTemplate = function (template, options, callback) {
+    return baseParseTemplate(template, options, callback);
+  }
+
+
+  // Node engine specific functions
+  // @function parseTemplateGlob (public) [Parse templates from glob patterns and return a result object containing relativePath and result] @param include @param options [exclude: to skip files, data] @param callback
+  instance.parseTemplateGlob = async function (include, options, callback) {
+    if (!callback) {
+      return new Promise(function (resolve, reject) {
+        instance.parseTemplateGlob(include, options, function (error, data) {
+          error ? reject(error) : resolve(data);
         });
       });
-    });
-  });
-  if (empty) {
-    callback(new Error("No files"));
-  }
-};
-
-// @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
-module.exports.parseTemplateGlobAndWrite = async function (include, output, options, callback) {
-  if (!callback) {
-    return new Promise(function (resolve, reject) {
-      module.exports.parseTemplateGlobAndWrite(include, output, options, function (error) {
-        error ? reject(error) : resolve();
-      });
-    });
-  }
-  options = options || {};
-  if (options.clean) {
-    await io.deleteFolderRecursive(output);
-  }
-  module.exports.parseTemplateGlob(include, options, function (error, data) {
-    if (error) {
-      callback(error);
-    } else {
-      if (data && output) {
-        // Write data to output without .vmt extension
-        var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
-        fs.mkdirs(path.dirname(fileOutput), function () {
-          fs.writeFile(fileOutput, data.result, function () {
-            if (!("log" in options) || options.log) {
-              console.log("->", fileOutput);
-            }
-            callback();
+    }
+    options = options || {};
+    var rootsArray = await io.getFiles(include, options);
+    var empty = true;
+    rootsArray.forEach(function (rootObject) {
+      rootObject.files.forEach(function (relativePath) {
+        empty = false;
+        instance.parseTemplate(path.join(rootObject.root, relativePath), options, function (error, data) {
+          callback(error, {
+            relativePath: relativePath,
+            result: data
           });
         });
-      } else if (!data) {
-        callback(new Error("notFound"));
-      } else {
-        callback(new Error("syntaxError"));
-      }
+      });
+    });
+    if (empty) {
+      callback(new Error("No files"));
     }
-  });
-};
+  };
 
-// @function parseTemplateGlobAndWriteSync (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
-module.exports.parseTemplateGlobAndWriteSync = async function (include, output, options) {
-  options = options || {};
-  if (options.clean) {
-    io.deleteFolderRecursiveSync(output);
-  }
-  await module.exports.parseTemplateGlob(include, options, function (error, data) {
-    if (error) {
-      throw error;
-    } else {
-      if (data && output) {
-        // Write data to output without .vmt extension
-        var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
-        fs.mkdirsSync(path.dirname(fileOutput));
-        fs.writeFileSync(fileOutput, data.result);
-        if (!("log" in options) || options.log) {
-          console.log("->", fileOutput);
-        }
-      } else if (!data) {
-        throw new Error("notFound");
-      } else {
-        throw new Error("syntaxError");
-      }
-    }
-  });
-};
-
-
-// // @function parseTemplateGlobAndWriteSync (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
-// module.exports.parseTemplateGlobAndWriteSync = async function (include, output, options) {
-//   options = options || {};
-//   if (options.clean) {
-//     await io.deleteFolderRecursive(output);
-//   }
-//   var data = await module.exports.parseTemplateGlob(include, options);
-//   if (data && output) {
-//     // Write data to output without .vmt extension
-//     var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
-//     fs.mkdirsSync(path.dirname(fileOutput));
-//     fs.writeFileSync(fileOutput, data.result);
-//     if (!("log" in options) || options.log) {
-//       console.log("->", fileOutput);
-//     }
-//   } else if (!data) {
-//     throw new Error("notFound");
-//   } else {
-//     throw new Error("syntaxError");
-//   }
-//   console.log("FINISH");
-
-// };
-
-
-// @function watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder, watchdirectory:watch directories for changes and compile watch files] @param callback
-module.exports.watch = function (include, output, options) {
-  var watcher = [];
-  options = options || {};
-  var optionsCopy = JSON.parse(JSON.stringify(options));
-  if (options.data && typeof options.data != "object") {
-    var currentPath = options.data;
-    if (!path.isAbsolute(currentPath)) {
-      currentPath = path.join(cwd, options.data);
-    }
-    if (fs.existsSync(currentPath)) {
-      optionsCopy.data = JSON.parse(fs.readFileSync(currentPath));
-    }
-  }
-  module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
-  watcher.push(watch.watch(include, output, options));
-  if (options && options.watchdirectory) {
-    watcher.push(watch.watchDirectory(options.watchdirectory, options.exclude, function () {
-      var optionsCopy = JSON.parse(JSON.stringify(options));
-      if (options.data && typeof options.data != "object") {
-        var currentPath = options.data;
-        if (!path.isAbsolute(currentPath)) {
-          currentPath = path.join(cwd, options.data);
-        }
-        fs.stat(currentPath, function (err, data) {
-          if (!err) {
-            fs.readJson(currentPath, function (error, data) {
-              if (!error) {
-                optionsCopy.data = JSON.parse(fs.readFileSync(currentPath));
-                module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
-              }
-            });
-          }
+  // @function parseTemplateGlobAndWrite (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder] @param callback
+  instance.parseTemplateGlobAndWrite = async function (include, output, options, callback) {
+    if (!callback) {
+      return new Promise(function (resolve, reject) {
+        instance.parseTemplateGlobAndWrite(include, output, options, function (error) {
+          error ? reject(error) : resolve();
         });
+      });
+    }
+    options = options || {};
+    if (options.clean) {
+      await io.deleteFolderRecursive(output);
+    }
+    instance.parseTemplateGlob(include, options, function (error, data) {
+      if (error) {
+        callback(error);
       } else {
-        module.exports.parseTemplateGlobAndWrite(include, output, optionsCopy);
+        if (data && output) {
+          // Write data to output without .vmt extension
+          var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
+          fs.mkdirs(path.dirname(fileOutput), function () {
+            fs.writeFile(fileOutput, data.result, function () {
+              if (!("log" in options) || options.log) {
+                console.log("->", fileOutput);
+              }
+              callback();
+            });
+          });
+        } else if (!data) {
+          callback(new Error("notFound"));
+        } else {
+          callback(new Error("syntaxError"));
+        }
       }
-    }));
-  }
-  return watcher;
+    });
+  };
+
+  // @function parseTemplateGlobAndWriteSync (public) [Parse templates from glob patterns and write the result to disk] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder]
+  instance.parseTemplateGlobAndWriteSync = async function (include, output, options) {
+    options = options || {};
+    if (options.clean) {
+      io.deleteFolderRecursiveSync(output);
+    }
+    await instance.parseTemplateGlob(include, options, function (error, data) {
+      if (error) {
+        throw error;
+      } else {
+        if (data && output) {
+          // Write data to output without .vmt extension
+          var fileOutput = path.join(output, data.relativePath).replace(".vmt", "");
+          fs.mkdirsSync(path.dirname(fileOutput));
+          fs.writeFileSync(fileOutput, data.result);
+          if (!("log" in options) || options.log) {
+            console.log("->", fileOutput);
+          }
+        } else if (!data) {
+          throw new Error("notFound");
+        } else {
+          throw new Error("syntaxError");
+        }
+      }
+    });
+  };
+
+
+  // @function watch (public) [Parse templates from glob patterns and keep listen for changes] @param include @param output [Output folder, it respects files structure from include pattern] @param options [exclude: to skip files, data and clean: to empty destination folder, watchdirectory:watch directories for changes and compile watch files] @param callback
+  instance.watch = function (include, output, options) {
+    var watcher = [];
+    options = options || {};
+    var optionsCopy = JSON.parse(JSON.stringify(options));
+    if (options.data && typeof options.data != "object") {
+      var currentPath = options.data;
+      if (!path.isAbsolute(currentPath)) {
+        currentPath = path.join(cwd, options.data);
+      }
+      if (fs.existsSync(currentPath)) {
+        optionsCopy.data = JSON.parse(fs.readFileSync(currentPath));
+      }
+    }
+    instance.parseTemplateGlobAndWrite(include, output, optionsCopy);
+    watcher.push(watch.watch(include, output, options));
+    if (options && options.watchdirectory) {
+      watcher.push(watch.watchDirectory(options.watchdirectory, options.exclude, function () {
+        var optionsCopy = JSON.parse(JSON.stringify(options));
+        if (options.data && typeof options.data != "object") {
+          var currentPath = options.data;
+          if (!path.isAbsolute(currentPath)) {
+            currentPath = path.join(cwd, options.data);
+          }
+          fs.stat(currentPath, function (err, data) {
+            if (!err) {
+              fs.readJson(currentPath, function (error, data) {
+                if (!error) {
+                  optionsCopy.data = JSON.parse(fs.readFileSync(currentPath));
+                  instance.parseTemplateGlobAndWrite(include, output, optionsCopy);
+                }
+              });
+            }
+          });
+        } else {
+          instance.parseTemplateGlobAndWrite(include, output, optionsCopy);
+        }
+      }));
+    }
+    return watcher;
+  };
+
+  return instance;
 };
+
+
 
 
 // Command mode
 if (!module.parent) {
+
+  var cliMetaInstance = module.exports.instance();
 
   function list(value) {
     var result = value.split(",");
@@ -300,7 +274,7 @@ if (!module.parent) {
     }
   }
   if (cli.result.preventCommented) {
-    module.exports.parseCommented = false;
+    cliMetaInstance.parseCommented = false;
   }
 
   var include = cli.result.include || path.join(cwd, "**/*.vmt");
@@ -325,9 +299,9 @@ if (!module.parent) {
       if (typeof (cli.result.watch) != "boolean") {
         options.watchdirectory = cli.result.watch;
       }
-      module.exports.watch(include, output, options);
+      cliMetaInstance.watch(include, output, options);
     } else {
-      module.exports.parseTemplateGlobAndWriteSync(include, output, options);
+      cliMetaInstance.parseTemplateGlobAndWriteSync(include, output, options);
     }
   }
 
