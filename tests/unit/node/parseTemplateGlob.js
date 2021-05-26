@@ -5,8 +5,7 @@ const {
 const {
     assert
 } = intern.getPlugin("chai");
-
-var meta = require("../../../src/node");
+var meta = require("../../../src/node").instance();
 var path = require("path");
 
 suite("parseTemplateGlob", () => {

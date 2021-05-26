@@ -5,8 +5,7 @@ const {
 const {
     assert
 } = intern.getPlugin("chai");
-
-var meta = require("../../../src/node");
+var meta = require("../../../src/node").instance();
 
 var template = "Hello i'm a template! <%= \"AWESOME!\" %>";
 var templateBasePath = "Hello i'm a template! <% template('template2.vmi'); %> Next  <% template('within/template3.vmi'); %>";

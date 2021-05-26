@@ -1,7 +1,6 @@
 var commons = require("@vimlet/commons");
 var chrome = "start chrome";
-
-var meta = require("../../../src/node");
+var meta = require("../../../src/node").instance();
 var path = require("path");
 
 // Works but throw errors because of imported files.
