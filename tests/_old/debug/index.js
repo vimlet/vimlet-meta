@@ -1,4 +1,4 @@
-var commons = require("@vimlet/commons");
+// var commons = require("@vimlet/commons");
 var chrome = "start chrome";
 var meta = require("../../../src/node").instance();
 var path = require("path");
@@ -7,7 +7,7 @@ var path = require("path");
 // meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*"), path.join(__dirname, "output"), {exclude:"resources/excluded/*"});
 
 // Works without errors because it just parse .vmt files
-meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources/**/*.vmt"), path.join(__dirname, "output"), {exclude:"resources/excluded/*", data:path.join(__dirname, 'resources/data.json')});
+meta.parseTemplateGlobAndWrite(path.join(__dirname, "resources.1/**/*.vmt"), path.join(__dirname, "output"), {exclude:"resources/excluded/*", data:path.join(__dirname, 'resources/data.json')});
 
 
 // meta.watch(path.join(__dirname, "resources"), path.join(__dirname, "output"), {exclude:"resources/excluded/*",watchdirectory:"resources",data:"resources/data.json"});

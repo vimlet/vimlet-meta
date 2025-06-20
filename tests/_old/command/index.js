@@ -7,21 +7,21 @@ var wrongDir = path.join(__dirname, "resources1/**/*.vmt");
 var output = path.join(__dirname, "output");
 var data = path.join(__dirname, "resources/data.json");
 
-// run.exec("node", {args:[metaBin, "-i", include, "-o", output, "-d", data, "-nl"]}, function (error, data) {
-//   if (error) {
-//     console.error(error);
-//   } else {
-//     console.log("done!");
-//   }
-// });
-
-run.exec("node", {args:[metaBin, "-i", wrongDir, "-o", output, "-d", data]}, function (error, data) {
+run.exec("node", {args:[metaBin, "-i", include, "-o", output, "-d", data, "-nl"]}, function (error, data) {
   if (error) {
     console.error(error);
   } else {
     console.log("done!");
   }
 });
+
+// run.exec("node", {args:[metaBin, "-i", wrongDir, "-o", output, "-d", data]}, function (error, data) {
+//   if (error) {
+//     console.error(error);
+//   } else {
+//     console.log("done!");
+//   }
+// });
 
 // run.exec("node", {args:[metaBin, "-i", include, "-o", output, "-d", data , "-w", "resources"]}, function (error, data) {
 //   if (error) {

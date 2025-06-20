@@ -49,7 +49,9 @@ module.exports.instance = function () {
   // Override fileProvider for node
   instance.__fileProvider = function (filePath, callback) {
     var fixedPath = filePath;
-    if (filePath.indexOf("/") === 0) { // /path means that current path start from working directory
+    if (path.isAbsolute(filePath)) {
+      fixedPath = filePath;
+    } else if (filePath.indexOf("/") === 0) { // /path means that current path start from working directory
       if (filePath.indexOf(cwd) < 0) { // Avoid linux absolute path issue starting by /
         fixedPath = path.join(cwd, filePath);
       }
