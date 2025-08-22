@@ -19,6 +19,9 @@ vimlet.meta = vimlet.meta || {};
   // Tags Array [tagOpen, tagClose, tagEcho]
   vimlet.meta.tags = vimlet.meta.tags || ["<%", "%>", "="];
 
+  // Parse error managing
+  vimlet.meta.errorManaging = vimlet.meta.errorManaging || "strict";
+
   // Parse commented templates
   vimlet.meta.parseCommented = vimlet.meta.parseCommented || true;
   // Comment tags array
@@ -41,6 +44,11 @@ vimlet.meta = vimlet.meta || {};
       });
     }
     options = options || {};
+
+    if ("errorManaging" in options) {
+      vimlet.meta.errorManaging = options.errorManaging;
+    }
+
     if (vimlet.meta.decodeHTML) {
       text = vimlet.meta.__decodeHTMLEntities(text);
     }
@@ -251,6 +259,10 @@ vimlet.meta = vimlet.meta || {};
       sandbox.context = scope;
     }
 
+    sandbox.meta = sandbox.meta || {};
+    sandbox.meta.errorManaging = vimlet.meta.errorManaging;
+
+
     // Inject sandbox functions
     vimlet.meta.__injectSandboxFunctions(sandbox);
 
@@ -313,6 +325,20 @@ vimlet.meta = vimlet.meta || {};
     };
 
     sandbox.__parse = function (t, templatePath, options) {
+      options = options || {};
+
+      if (t === undefined) {
+        const message = `⚠️ meta: template is undefined can not parse. File: ${templatePath || "(unknown)"}`;
+
+        if (vimlet.meta.errorManaging === "strict") {
+          throw new Error(message);
+        } else if (vimlet.meta.errorManaging === "warn") {
+          console.warn(message);
+        }
+
+        return "";
+      }
+
       var result = "";
 
       if (vimlet.meta.parseCommented) {
@@ -330,7 +356,7 @@ vimlet.meta = vimlet.meta || {};
       result = t.replace(vimlet.meta.__regex, function (match) {
         endOfLine = vimlet.meta.__preserveNewLineIfNeeded(match);
         match = vimlet.meta.__cleanMatch(match);
-        var basePath = options ? options.basePath ? options.basePath : vimlet.meta.__getBasePath(templatePath) : vimlet.meta.__getBasePath(templatePath);
+        var basePath = options.basePath || vimlet.meta.__getBasePath(templatePath);
         var res = sandbox.__eval(match, basePath, options);
         if (res) {
           return res + endOfLine;
