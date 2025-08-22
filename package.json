@@ -1,6 +1,6 @@
 {
   "name": "@vimlet/meta",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "description": "",
   "main": "src/node/index.js",
   "bin": {
